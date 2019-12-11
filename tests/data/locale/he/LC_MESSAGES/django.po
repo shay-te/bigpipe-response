@@ -1,0 +1,318 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: test\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-12-02 11:09+0200\n"
+"Language: he\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+
+#: .\settings.py:153
+msgid "English"
+msgstr ""
+
+#: .\settings.py:154
+msgid "Hebrew"
+msgstr ""
+
+msgid "login_i_am_looking_for"
+msgstr "אני מחפש"
+
+msgid "login_singin_with_facebook"
+msgstr "התחבר עם facebook"
+
+msgid "profile_full_empty_questions"
+msgstr "הם עדיין לא רשמו כלום על עצמם"
+
+msgid "mailbox_empty_received"
+msgstr "תרם התקבלו הודעות חדשות"
+
+msgid "mailbox_empty_sent"
+msgstr "תרם שלחת הודעות"
+
+msgid "mailbox_empty_unread"
+msgstr "כל ההודעות נקראו"
+
+msgid "profileboxes_no_more_profiles"
+msgstr "לא נמצאו פרופילים נוספים"
+
+msgid "CONST_USER_gender_1"
+msgstr "נקבה"
+
+msgid "CONST_USER_gender_2"
+msgstr "זכר"
+
+msgid "CONST_USER_orientation_1"
+msgstr "סטרייט"
+
+msgid "CONST_USER_orientation_2"
+msgstr "גיי"
+
+msgid "CONST_USER_orientation_3"
+msgstr "דו מיני"
+
+msgid "CONST_USER_marital_status_1"
+msgstr "רווק"
+
+msgid "CONST_USER_marital_status_2"
+msgstr "גרוש"
+
+msgid "CONST_USER_marital_status_3"
+msgstr "פרוד"
+
+msgid "CONST_USER_marital_status_4"
+msgstr "אלמן"
+
+msgid "CONST_USER_marital_status_5"
+msgstr "מערכת יחסים פתוחה"
+
+msgid "CONST_USER_marital_status_6"
+msgstr "זה מסובך"
+
+msgid "CONST_USER_body_type_1"
+msgstr "רזה"
+
+msgid "CONST_USER_body_type_2"
+msgstr "עודף משקל"
+
+msgid "CONST_USER_body_type_3"
+msgstr "צנום"
+
+msgid "CONST_USER_body_type_4"
+msgstr "ממוצע"
+
+msgid "CONST_USER_body_type_5"
+msgstr "חטוב"
+
+msgid "CONST_USER_body_type_6"
+msgstr "אתלטי"
+
+msgid "CONST_USER_body_type_7"
+msgstr "מעט משקל עודף"
+
+msgid "CONST_USER_body_type_8"
+msgstr "עגלגל"
+
+msgid "CONST_USER_body_type_9"
+msgstr "מלא"
+
+msgid "CONST_USER_smoking"
+msgstr "מעשן"
+
+msgid "CONST_USER_smoke_1"
+msgstr "כן"
+
+msgid "CONST_USER_smoke_2"
+msgstr "לעמים"
+
+msgid "CONST_USER_smoke_3"
+msgstr "כאשר שותה"
+
+msgid "CONST_USER_smoke_4"
+msgstr "בחברה"
+
+msgid "CONST_USER_smoke_5"
+msgstr "מנסה להפסיק"
+
+msgid "CONST_USER_smoke_6"
+msgstr "לא"
+
+msgid "CONST_USER_drinks"
+msgstr "שותה אלכוהול"
+
+msgid "CONST_USER_drink_1"
+msgstr "לעיתים תכופות"
+
+msgid "CONST_USER_drink_2"
+msgstr "לפעמים"
+
+msgid "CONST_USER_drink_3"
+msgstr "בחברה"
+
+msgid "CONST_USER_drink_4"
+msgstr "לעיתים נדירות"
+
+msgid "CONST_USER_drink_5"
+msgstr "בכלל לא"
+
+msgid "CONST_USER_education_1"
+msgstr "יסודי"
+
+msgid "CONST_USER_education_2"
+msgstr "תיכון"
+
+msgid "CONST_USER_education_3"
+msgstr "מכללה"
+
+msgid "CONST_USER_education_4"
+msgstr "תואר ראשון"
+
+msgid "CONST_USER_education_5"
+msgstr "תואר שני"
+
+msgid "CONST_USER_education_6"
+msgstr "דוקטורט"
+
+msgid "CONST_USER_education_7"
+msgstr "אחר"
+
+msgid "CONST_USER_kids_1"
+msgstr "אין לי ילדים"
+
+msgid "CONST_USER_kids_2"
+msgstr "יש לי ילד"
+
+msgid "CONST_USER_kids_3"
+msgstr "יש לי ילדים"
+
+msgid "CONST_USER_job_description_1"
+msgstr "חשבונאות/כלכלה/ביטוח"
+
+msgid "CONST_USER_job_description_2"
+msgstr "ניהול/פקידותית"
+
+msgid "CONST_USER_job_description_3"
+msgstr "ביוטכנולוגיה/מדע"
+
+msgid "CONST_USER_job_description_4"
+msgstr "קבלן בניה/סוחר"
+
+msgid "CONST_USER_job_description_5"
+msgstr "יצירתי/עיצוב"
+
+msgid "CONST_USER_job_description_6"
+msgstr "שירות לקוחות"
+
+msgid "CONST_USER_job_description_7"
+msgstr "עריכה/כתיבה"
+
+msgid "CONST_USER_job_description_8"
+msgstr "השכלה/הדרכה"
+
+msgid "CONST_USER_job_description_9"
+msgstr "מזון/מסעדנות"
+
+msgid "CONST_USER_job_description_10"
+msgstr "התקנה/תחזוקה/תיקון"
+
+msgid "CONST_USER_job_description_11"
+msgstr "It/Software development/QA"
+
+msgid "CONST_USER_job_description_12"
+msgstr "ליגיסטיקה/תחבורה/נסיעות"
+
+msgid "CONST_USER_job_description_13"
+msgstr "יצור/הפקה/תפעול"
+
+msgid "CONST_USER_job_description_14"
+msgstr "רפואה/בריאות"
+
+msgid "CONST_USER_job_description_15"
+msgstr "פרויקט/ ניהול פרויקט"
+
+msgid "CONST_USER_job_description_16"
+msgstr "בדיקות איכות/בטיחות"
+
+msgid "CONST_USER_job_description_17"
+msgstr "אבטחה/שירותי אבטחה"
+
+msgid "CONST_USER_job_description_18"
+msgstr "אנתרופולוגיה/ארכיאולוגיה"
+
+msgid "CONST_USER_job_description_19"
+msgstr "מכירות/שיווק"
+
+msgid "CONST_USER_job_description_20"
+msgstr "סרט/טלבזיה/קולנוע"
+
+msgid "CONST_USER_job_description_21"
+msgstr "אומנות/בידור"
+
+msgid "CONST_USER_job_description_22"
+msgstr "ללא רווח/שירותי רווחה"
+
+msgid "CONST_USER_job_description_23"
+msgstr "עסקים/ניהול אסטרטגי"
+
+msgid "CONST_USER_job_description_24"
+msgstr "הפצה/משלוח"
+
+msgid "CONST_USER_job_description_25"
+msgstr "דת/מוסד דתי"
+
+msgid "CONST_USER_job_description_26"
+msgstr "אירוח/בית מלון"
+
+msgid "CONST_USER_job_description_27"
+msgstr "מדייה/עיתונאות/עיתון"
+
+msgid "CONST_USER_job_description_28"
+msgstr "פוליטי/ממשלתי"
+
+msgid "CONST_USER_job_description_29"
+msgstr "משאבי אנוש"
+
+msgid "CONST_USER_job_description_30"
+msgstr "נדלן"
+
+msgid "CONST_USER_job_description_31"
+msgstr "פרסום"
+
+msgid "CONST_USER_job_description_32"
+msgstr "חוק/שירותי חוק"
+
+msgid "CONST_USER_job_description_33"
+msgstr "ספורט"
+
+msgid "CONST_USER_job_description_34"
+msgstr "צבאי"
+
+msgid "CONST_USER_job_description_35"
+msgstr "מובטל"
+
+msgid "CONST_USER_job_description_36"
+msgstr "אחר"
+
+msgid "CONST_USER_open_question_1"
+msgstr "אודותי"
+
+msgid "CONST_USER_open_question_2"
+msgstr "מה אני עושה בחיים"
+
+msgid "CONST_USER_open_question_3"
+msgstr "הביוגרפיה שלי"
+
+msgid "CONST_USER_open_question_4"
+msgstr "מה אני מחפש"
+
+msgid "CONST_USER_open_question_5"
+msgstr "התחביבים שלי"
+
+msgid "CONST_USER_open_question_6"
+msgstr "דייט מושלם הוא"
+
+msgid "CONST_USER_open_question_7"
+msgstr "מערכת יחסים טובה היא"
+
+msgid "CONST_USER_open_question_8"
+msgstr "תכתוב לי אם"
+
+msgid "CONST_USER_open_question_9"
+msgstr "ציטוטים אהובים"
+
+msgid "CONST_USER_open_question_placeholder_1"
+msgstr "ספר משהו על עצמך"
+
+msgid "CONST_USER_open_question_placeholder_2"
+msgstr "מה אתה עושה בחיים"
+
+msgid "CONST_USER_open_question_placeholder_3"
+msgstr "התרבב קצת"
+
+msgid "CONST_USER_open_question_placeholder_4"
+msgstr "היכן אתה רוצה להיות במערכת היחסים הבאה שלך"
+
+msgid "CONST_USER_open_question_placeholder_5"
+msgstr "מה אתה עושה בשביל הכיף"

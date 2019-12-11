@@ -1,0 +1,29 @@
+.bigpipe-error {
+    position: fixed;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    overflow: auto;
+    background: white;
+    color: white;
+    background: #2f2c2c;
+    z-index: 16777271;
+    font-size:
+}
+
+.bigpipe-error > div{
+    padding: 10px;
+}
+
+.bigpipe-error .bigpipe-error-title {
+    padding: 20px 10px;
+    color: white;
+    font-size: 30px;
+    background: #B00012;
+}
+
+.bigpipe-error .bigpipe-error-body {
+    white-space: pre;
+    font-size: 17px;
+}

@@ -1,0 +1,8 @@
+@import 'params';
+@import 'folder/file1';
+@import 'file2';
+@import '../file3';
+
+.test-class {
+    color: $color-grey-5;
+}

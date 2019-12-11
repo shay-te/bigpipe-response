@@ -1,0 +1,21 @@
+# IDEA
+/.idea
+**/.DS_Store
+**/*.db
+**/*.db-journal
+
+# PYTHON
+/venv
+**/*.pyc
+**/*.pyo
+**/__pycache__/*
+__pycache__/
+
+# JS
+/bigpipe_response/js/node_modules
+/bigpipe_response/js/package-lock.json
+/bigpipe_response/js/dependencies/jsi18n.js
+/bigpipe_response/js/registered_processors/*
+
+# TESTS
+/tests/data_output
