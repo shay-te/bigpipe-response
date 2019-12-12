@@ -1,3 +1,4 @@
+import bigpipe_response
 import setuptools
 
 with open("README.md", "r") as fh:
@@ -5,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
    name='bigpipe_response',
-   version='0.0.1',
+   version=bigpipe_response.__version__,
    description='response object for django',
    long_description=long_description,
    long_description_content_type="text/markdown",

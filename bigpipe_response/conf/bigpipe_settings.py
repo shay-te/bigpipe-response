@@ -38,6 +38,10 @@ class BigpipeSettings:
         if self.CLIENT_BASE_PATH and not isinstance(self.CLIENT_BASE_PATH, list):
             raise InvalidConfiguration('CLIENT_BASE_PATH must be supplied as list')
 
+        for client_base_path in self.CLIENT_BASE_PATH:
+            if not os.path.exists(client_base_path):
+                raise ValueError('CLIENT_BASE_PATH directory dose not exists. [{}]'.format(client_base_path))
+
         if not self.RENDERED_OUTPUT_PATH or not os.path.isdir(self.RENDERED_OUTPUT_PATH):
             raise InvalidConfiguration('RENDERED_OUTPUT_PATH need to be a an exists path')
 
