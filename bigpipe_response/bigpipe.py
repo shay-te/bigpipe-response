@@ -1,4 +1,6 @@
 import logging
+import os
+from shutil import copyfile
 
 from bigpipe_response.bigpipe_render_options import BigpipeRenderOptions
 from bigpipe_response.conf.bigpipe_settings import BigpipeSettings
@@ -22,7 +24,13 @@ class Bigpipe(object):
                                                           css_complete_dependencies_by_js=self.conf.CSS_COMPLETE_DEPENDENCIES_BY_JS,
                                                           javascript_dom_bind=self.conf.JS_DOM_BIND)
 
+        # processors manager
         self.processors_manager = ProcessorsManager(self.conf, processors)
+
+        # install js dependencies
+
+        javascript_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'js')
+        copyfile(os.path.join(javascript_folder, 'browser', 'bigpipe.js'), os.path.join(self.conf.RENDERED_OUTPUT_PATH, 'bigpipe.js'))
 
     @staticmethod
     def init(settings, processors: list = []):
