@@ -23,13 +23,27 @@ class BigpipeResponse(StreamingHttpResponse):
         JAVASCRIPT = enum.auto()
         JAVASCRIPT_RENDER = enum.auto()
 
-    def __init__(self, request, render_type=RenderType.TEMPLATE, render_source=None, render_context={}, pagelets=[], js_dependencies=[], scss_dependencies=[], i18n_dependencies=[], render_options: BigpipeRenderOptions=None):
+    def __init__(self, request,
+                 render_type=RenderType.TEMPLATE,
+                 render_source=None,
+                 render_context={},
+                 pagelets=[],
+                 js_dependencies=[],
+                 scss_dependencies=[],
+                 i18n_dependencies=[],
+                 render_options: BigpipeRenderOptions = None):
+
         super().__init__(streaming_content=self.__stream_content())
-        if request is None: raise ValueError('request cannot be None')
-        if render_type is None: raise ValueError('render_type cannot be None')
-        if render_source is None: raise ValueError('render_source cannot be None')
-        if render_context is None or not isinstance(render_context, dict): raise ValueError('render context must be a dict')
-        if render_options is not None and not isinstance(render_options, BigpipeRenderOptions): raise ValueError('render_options can be None or instance of BigpipeRenderOptions')
+        if request is None:
+            raise ValueError('request cannot be None')
+        if render_type is None:
+            raise ValueError('render_type cannot be None')
+        if render_source is None:
+            raise ValueError('render_source cannot be None')
+        if render_context is None or not isinstance(render_context, dict):
+            raise ValueError('render context must be a dict')
+        if render_options is not None and not isinstance(render_options, BigpipeRenderOptions):
+            raise ValueError('render_options can be None or instance of BigpipeRenderOptions')
 
         self.logger = logging.getLogger(self.__class__.__name__)
         self.request = request
@@ -44,7 +58,7 @@ class BigpipeResponse(StreamingHttpResponse):
         self.local_language = translation.get_language()
         self.processed_js_files, self.processed_css_files = [], []
 
-    def process_paglet(self, pagelet, result_queue):
+    def __process_paglet(self, pagelet, result_queue):
         try:
             pagelet_response = pagelet.render()
             if isinstance(pagelet_response, BigpipeResponse):
@@ -70,7 +84,7 @@ class BigpipeResponse(StreamingHttpResponse):
             paglent_count = len(self.pagelets)
             for pagelet in self.pagelets:
                 last_pagelet_target = pagelet.target
-                threading.Thread(target=self.process_paglet, args=(pagelet, que), daemon=True).start()
+                threading.Thread(target=self.__process_paglet, args=(pagelet, que), daemon=True).start()
 
             for _ in range(paglent_count):
                 pageelet_response = que.get()
@@ -166,7 +180,7 @@ class BigpipeResponse(StreamingHttpResponse):
             css_dependencies_result = self.__run_processor(self.render_options.css_processor_name,
                                                            self.render_source,
                                                            include_dependencies=include_dependencies,
-                                                           exclude_dependencies=exclude_dependencies,
+                                                           exclude_dependencies=[],  # exclude_dependencies,
                                                            generate_missing_source=True)
             # effected files will be only 'include_dependencies' and NOT 'css_dependencies_result.effected_files'.
             # since included files my have scss variables

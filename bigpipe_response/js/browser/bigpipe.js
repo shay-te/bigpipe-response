@@ -16,6 +16,8 @@ window.renderPagelet = function(p) {
             return;
         }
 
+        if(p.i18n) { renderI18n(p.i18n); }
+
         if(p.html) {
             el.innerHTML = p.html;
         }
@@ -43,7 +45,6 @@ window.renderPagelet = function(p) {
                 script.parentElement.removeChild(script);
             }
         }
-        if(p.i18n) { renderI18n(p.i18n); }
     } catch(err) {
         console.error(err.stack);
     }

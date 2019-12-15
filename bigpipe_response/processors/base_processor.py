@@ -50,5 +50,5 @@ class BaseProcessor(object):
         return os.path.join(self.output_directory, output_file_name)
 
     def __dependencies_to_hash(self, dependencies_list: list):
-        # return hashlib.blake2b(str(dependencies_list).encode(), digest_size=5).hexdigest() if dependencies_list else '_'
+        # return hashlib.blake2b(str(dependencies_list).encode(), digest_size=5).hexdigest() if dependencies_list else '_' NOT YET SUPPORTED
         return '_'
