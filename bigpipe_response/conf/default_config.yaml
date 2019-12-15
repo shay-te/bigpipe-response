@@ -1,0 +1,26 @@
+rendered_output_path: null
+static_uri: null
+is_production_mode: null
+
+js_processor_name: jsx
+js_source_path: none
+js_processor_source_ext:
+  - js
+  - jsx
+js_processor_target_ext: js
+js_processor_handler_path: bigpipe_response.processors.RollupReactProcessor.js
+js_dom_bind: bigpipe_response.javascript_dom_bind.react_dom_bind.ReactDomBind
+js_link_bundle_dependencies: true
+
+css_processor_name: css
+css_source_path: none
+css_processor_source_ext:
+  - scss
+css_processor_target_ext: css
+css_complete_dependencies_by_js: true
+css_link_bundle_dependencies: true
+
+i18n_processor_name: i18n
+js_server_port_start: 7480
+js_server_port_count: 10
+js_server_extra_node_packages: []

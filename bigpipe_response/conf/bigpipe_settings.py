@@ -1,105 +1,98 @@
 import os
 
-from bigpipe_response.conf import default_settings
+from omegaconf import ListConfig, OmegaConf
+from pkg_resources import resource_exists
+
 from bigpipe_response.exceptions import InvalidConfiguration
 from bigpipe_response.javascript_dom_bind.javascript_dom_bind import JavascriptDOMBind
+from bigpipe_response.processors.remote_js_processor import RemoteJsProcessor
+
+
+
+def get_class(path):
+    try:
+        from importlib import import_module
+
+        module_path, _, class_name = path.rpartition(".")
+        mod = import_module(module_path)
+        try:
+            klass = getattr(mod, class_name)
+        except AttributeError:
+            raise ImportError(
+                "Class {} is not in module {}".format(class_name, module_path)
+            )
+        return klass
+    except ValueError as e:
+        raise e
 
 
 class BigpipeSettings:
 
-    def __init__(self, settings_module_path):
-        if not os.path.isfile(settings_module_path):
-            raise  InvalidConfiguration('configuration module dose not exists [{}]'.format(settings_module_path))
+    @staticmethod
+    def validate_settings(config):
+        js_source_path = OmegaConf.to_container(config.js_source_path, resolve=True)
+        css_source_path = OmegaConf.to_container(config.css_source_path, resolve=True)
 
-        # update this dict from global settings (but only for ALL_CAPS settings)
-        for setting in dir(default_settings):
-            if setting.isupper():
-                setattr(self, setting, getattr(default_settings, setting))
+        if js_source_path and not isinstance(js_source_path, list):
+            raise InvalidConfiguration('js_source_path must be supplied as list')
 
-        # store the settings module in case someone later cares
-        self.SETTINGS_MODULE = 'bigpipe_module'
-
-        import importlib.util
-        spec = importlib.util.spec_from_file_location(self.SETTINGS_MODULE, settings_module_path)
-        mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(mod)
-
-        self._explicit_settings = set()
-        for setting in dir(mod):
-            if setting.isupper():
-                setting_value = getattr(mod, setting)
-
-                setattr(self, setting, setting_value)
-                self._explicit_settings.add(setting)
-
-        self.__validate_settings()
-
-    def __validate_settings(self):
-        if self.JS_SOURCE_PATH and not isinstance(self.JS_SOURCE_PATH, list):
-            raise InvalidConfiguration('JS_SOURCE_PATH must be supplied as list')
-
-        for source_base_path in self.JS_SOURCE_PATH:
+        for source_base_path in js_source_path:
             if not os.path.exists(source_base_path):
-                raise ValueError('JS_SOURCE_PATH directory dose not exists. [{}]'.format(source_base_path))
+                raise InvalidConfiguration('js_source_path directory dose not exists. [{}]'.format(source_base_path))
 
-        if self.CSS_SOURCE_PATH and not isinstance(self.CSS_SOURCE_PATH, list):
-            raise InvalidConfiguration('JS_SOURCE_PATH must be supplied as list')
+        if css_source_path and not isinstance(css_source_path, list):
+            raise InvalidConfiguration('js_source_path must be supplied as list')
 
-        for source_base_path in self.CSS_SOURCE_PATH:
+        for source_base_path in css_source_path:
             if not os.path.exists(source_base_path):
-                raise ValueError('CSS_SOURCE_PATH directory dose not exists. [{}]'.format(source_base_path))
+                raise InvalidConfiguration('css_source_path directory dose not exists. [{}]'.format(source_base_path))
 
-        if not self.RENDERED_OUTPUT_PATH or not os.path.isdir(self.RENDERED_OUTPUT_PATH):
-            raise InvalidConfiguration('RENDERED_OUTPUT_PATH need to be a an exists path')
+        if not config.rendered_output_path or not os.path.isdir(config.rendered_output_path):
+            raise InvalidConfiguration('rendered_output_path need to be a an exists path')
 
-        if not isinstance(self.IS_PRODUCTION_MODE, bool):
-            raise InvalidConfiguration('IS_PRODUCTION_MODE must be of type boolean')
+        if not isinstance(config.is_production_mode, bool):
+            raise InvalidConfiguration('is_production_mode must be of type boolean')
 
-        if not self.JS_PROCESSOR_NAME:
-            raise InvalidConfiguration('JS_PROCESSOR_NAME must be set')
+        if not config.js_processor_name:
+            raise InvalidConfiguration('js_processor_name must be set')
 
-        if not self.JS_PROCESSOR_SOURCE_EXT or not isinstance(self.JS_PROCESSOR_SOURCE_EXT, list):
-            raise InvalidConfiguration('JS_PROCESSOR_SOURCE_EXT must be a populated list')
+        if not config.js_processor_source_ext or not isinstance(OmegaConf.to_container(config.js_processor_source_ext, resolve=True), list):
+            raise InvalidConfiguration('js_processor_source_ext must be a populated list')
 
-        if not self.JS_PROCESSOR_TARGET_EXT:
-            raise InvalidConfiguration('JS_PROCESSOR_TARGET_EXT must be set')
+        if not config.js_processor_target_ext:
+            raise InvalidConfiguration('js_processor_target_ext must be set')
 
-        if not self.JS_PROCESSOR_HANDLER_PATH or not os.path.isfile(self.JS_PROCESSOR_HANDLER_PATH) :
-            raise InvalidConfiguration('JS_PROCESSOR_HANDLER_PATH must be set to a javascript file')
+        if not config.js_processor_handler_path.strip().lower().endswith('.js'):
+            raise InvalidConfiguration('js_processor_handler_path must be with js extension.')
 
-        if not self.JS_PROCESSOR_HANDLER_PATH.strip().lower().endswith('.js'):
-            raise InvalidConfiguration('JS_PROCESSOR_HANDLER_PATH must be with js extension.')
+        path, resource = RemoteJsProcessor.build_js_resource(config.js_processor_handler_path)
 
-        if not self.JS_DOM_BIND or not isinstance(self.JS_DOM_BIND, JavascriptDOMBind):
-            raise InvalidConfiguration('JS_DOM_BIND must be set and instance of JavascriptDOMBind')
+        if not config.js_processor_handler_path or not resource_exists(path, resource):
+            raise InvalidConfiguration('js_processor_handler_path must be set to a javascript file')
 
-        if not self.CSS_PROCESSOR_NAME:
-            raise InvalidConfiguration('CSS_PROCESSOR_NAME must be set')
+        if JavascriptDOMBind not in get_class(config.js_dom_bind).__bases__:
+            raise InvalidConfiguration('js_dom_bind must be set and instance of javascriptdombind')
 
-        if not self.CSS_PROCESSOR_SOURCE_EXT or not isinstance(self.CSS_PROCESSOR_SOURCE_EXT, list):
-            raise InvalidConfiguration('CSS_PROCESSOR_SOURCE_EXT must be a populated list')
+        if not config.css_processor_name:
+            raise InvalidConfiguration('css_processor_name must be set')
 
-        if not self.CSS_PROCESSOR_TARGET_EXT:
-            raise InvalidConfiguration('CSS_PROCESSOR_TARGET_EXT must be set')
+        if not config.css_processor_source_ext or not isinstance(OmegaConf.to_container(config.css_processor_source_ext, resolve=True), list):
+            raise InvalidConfiguration('css_processor_source_ext must be a populated list')
 
-        if self.CSS_COMPLETE_DEPENDENCIES_BY_JS is None:
-            raise InvalidConfiguration('CSS_COMPLETE_DEPENDENCIES_BY_JS must be set to boolean')
+        if not config.css_processor_target_ext:
+            raise InvalidConfiguration('css_processor_target_ext must be set')
 
-        if self.CSS_LINK_BUNDLE_DEPENDENCIES is None:
-            raise InvalidConfiguration('CSS_LINK_BUNDLE_DEPENDENCIES must be set to boolean')
+        if config.css_complete_dependencies_by_js is None:
+            raise InvalidConfiguration('css_complete_dependencies_by_js must be set to boolean')
 
-        if not self.I18N_PROCESSOR_NAME:
-            raise InvalidConfiguration('I18N_PROCESSOR_NAME must be set')
+        if config.css_link_bundle_dependencies is None:
+            raise InvalidConfiguration('css_link_bundle_dependencies must be set to boolean')
 
-        if not self.JS_SERVER_PORT_START:
-            raise InvalidConfiguration('JS_SERVER_PORT_START must be set to a port number')
+        if not config.i18n_processor_name:
+            raise InvalidConfiguration('i18n_processor_name must be set')
 
-        if not self.JS_SERVER_PORT_COUNT:
-            raise InvalidConfiguration('JS_SERVER_PORT_START must be set to number of ports to scan')
+        if not config.js_server_port_start:
+            raise InvalidConfiguration('js_server_port_start must be set to a port number')
 
-    def __repr__(self):
-        return '<%(cls)s "%(settings_module)s">' % {
-            'cls': self.__class__.__name__,
-            'settings_module': self.SETTINGS_MODULE,
-        }
-
+        if not config.js_server_port_count:
+            raise InvalidConfiguration('js_server_port_start must be set to number of ports to scan')

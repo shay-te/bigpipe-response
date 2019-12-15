@@ -1,5 +1,6 @@
 import logging
-import os
+import pkg_resources
+
 
 from bigpipe_response.processors.base_file_processor import BaseFileProcessor
 from bigpipe_response.remote.remote_client_server import RemoteClientServer
@@ -7,17 +8,28 @@ from bigpipe_response.remote.remote_client_server import RemoteClientServer
 
 class RemoteJsProcessor(BaseFileProcessor):
 
-    def __init__(self, processor_name: str, remote_client_server: RemoteClientServer, processor_js_handler_path: str, is_production: bool, code_base_directories: list, output_directory: str, source_ext_list: list, target_ext: str, exclude_dir=None):
+    def __init__(self, processor_name: str, remote_client_server: RemoteClientServer, processor_js_resource: str, is_production: bool, code_base_directories: list, output_directory: str, source_ext_list: list, target_ext: str, exclude_dir=None):
         BaseFileProcessor.__init__(self, processor_name, is_production, code_base_directories, output_directory, source_ext_list, target_ext, exclude_dir=exclude_dir)
-        if not processor_js_handler_path: raise ValueError('processor_js_handler_path must be set')
-        if not os.path.isfile(processor_js_handler_path): raise ValueError('processor_js_handler_path must dose not exists')
+
+        self.resource_path, self.resource_name = RemoteJsProcessor.build_js_resource(processor_js_resource)
+
+        if not processor_js_resource:
+            raise ValueError('processor_js_resource must be set')
+        if not pkg_resources.resource_exists(self.resource_path, self.resource_name):
+            raise ValueError('processor_js_resource must dose not exists')
+
         self.logger = logging.getLogger(self.__class__.__name__)
         self.processor_name = processor_name
         self.remote_client_server = remote_client_server
-        self.processor_js_handler_path = processor_js_handler_path
+        self.processor_js_handler_path = processor_js_resource
 
-    def get_processor_js_handler_path(self):
-        return self.processor_js_handler_path
+    @staticmethod
+    def build_js_resource(resource):
+        arr = resource.rsplit('.', 2)
+        return arr[0], '{}.{}'.format(arr[1], arr[2])
+
+    def get_processor_js_as_string(self):
+        return pkg_resources.resource_string(self.resource_path, self.resource_name)
 
     def process_resource(self, input_file: str, output_file: str, include_dependencies: list, exclude_dependencies: list, options: dict = {}):
         include_files = []

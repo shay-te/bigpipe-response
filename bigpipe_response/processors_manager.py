@@ -1,8 +1,9 @@
 import logging
 import os
 
+from omegaconf import OmegaConf
+
 from bigpipe_response.conf.bigpipe_settings import BigpipeSettings
-from bigpipe_response.conf.default_settings import JS_PROCESSOR_NAME, I18N_PROCESSOR_NAME, CSS_PROCESSOR_NAME
 from bigpipe_response.processors.base_file_processor import BaseFileProcessor
 from bigpipe_response.processors.i18n_processor import I18nProcessor
 from bigpipe_response.processors.remote_js_processor import RemoteJsProcessor
@@ -18,7 +19,7 @@ class ProcessorsManager(object):
         self.logger = logging.getLogger(self.__class__.__name__)
 
         # set output directory
-        self.output_dir = os.path.normpath(os.path.join(self.conf.RENDERED_OUTPUT_PATH, 'component_cache'))
+        self.output_dir = os.path.normpath(os.path.join(self.conf.rendered_output_path, 'component_cache'))
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
 
@@ -30,7 +31,7 @@ class ProcessorsManager(object):
         self.logger.info('Installing javascript dependencies.')
         javascript_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'js')
         self.__install_javascript_dependencies(javascript_folder)
-        self.remote_client_server = RemoteClientServer(javascript_folder, self.conf.IS_PRODUCTION_MODE, self.conf.JS_SERVER_PORT_START, self.conf.JS_SERVER_PORT_COUNT, extra_node_packages=self.conf.JS_SERVER_EXTRA_NODE_PACKAGES)
+        self.remote_client_server = RemoteClientServer(javascript_folder, self.conf.is_production_mode, self.conf.js_server_port_start, self.conf.js_server_port_count, extra_node_packages=OmegaConf.to_container(self.conf.js_server_extra_node_packages, resolve=True))
 
         # walk on dependencies
         self.logger.info('Settings up processors.')
@@ -92,23 +93,23 @@ class ProcessorsManager(object):
         from bigpipe_response.processors.css_processor import CSSProcessor
         from bigpipe_response.processors.remote_js_processor import RemoteJsProcessor
 
-        jsx_processor = RemoteJsProcessor(JS_PROCESSOR_NAME,
+        jsx_processor = RemoteJsProcessor(self.conf.js_processor_name,
                                           self.remote_client_server,
-                                          self.conf.JS_PROCESSOR_HANDLER_PATH,
-                                          self.conf.IS_PRODUCTION_MODE,
-                                          list(self.conf.JS_SOURCE_PATH),
+                                          self.conf.js_processor_handler_path,
+                                          self.conf.is_production_mode,
+                                          OmegaConf.to_container(self.conf.js_source_path, resolve=True),
                                           self.output_dir,
-                                          list(self.conf.JS_PROCESSOR_SOURCE_EXT),
-                                          self.conf.JS_PROCESSOR_TARGET_EXT)
+                                          list(self.conf.js_processor_source_ext),
+                                          self.conf.js_processor_target_ext)
 
-        css_processor = CSSProcessor(CSS_PROCESSOR_NAME,
-                                     self.conf.IS_PRODUCTION_MODE,
-                                     list(self.conf.CSS_SOURCE_PATH),
+        css_processor = CSSProcessor(self.conf.css_processor_name,
+                                     self.conf.is_production_mode,
+                                     OmegaConf.to_container(self.conf.css_source_path, resolve=True),
                                      self.output_dir,
-                                     list(self.conf.CSS_PROCESSOR_SOURCE_EXT),
-                                     self.conf.CSS_PROCESSOR_TARGET_EXT)
+                                     list(self.conf.css_processor_source_ext),
+                                     self.conf.css_processor_target_ext)
 
-        i18n_processor = I18nProcessor(I18N_PROCESSOR_NAME, self.output_dir)
+        i18n_processor = I18nProcessor(self.conf.i18n_processor_name, self.output_dir)
 
         return {jsx_processor.processor_name: jsx_processor, css_processor.processor_name: css_processor, i18n_processor.processor_name: i18n_processor}
 

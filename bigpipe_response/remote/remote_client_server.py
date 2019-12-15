@@ -26,7 +26,7 @@ class RemoteClientServer(object):
 
     def __send_register_processors(self):
         for processor_name, processor in self._processors.items():
-            self.remote_js_client.register_processor(processor_name, processor.get_processor_js_handler_path())
+            self.remote_js_client.register_processor(processor_name, processor.get_processor_js_as_string())
 
     def send_process_file(self, processor_name: str, input_file: str, output_file: str, include_dependencies: list, exclude_dependencies: list, options: dict = {}):
         self.__validate_server_available()
