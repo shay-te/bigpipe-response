@@ -1,4 +1,6 @@
 import json
+import logging
+
 import requests
 import urllib.parse
 
@@ -9,11 +11,11 @@ class RemoteJSClient(object):
         self.session = requests.Session()
         self.url = url
         self.headers = {'Authorization': 'Basic {}'.format(token)}
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     def register_processor(self, processor_name: str, process_file: str):
         url = 'register_processor/{}'.format(processor_name)
-        data = {'process_file': process_file}
-        return self.__post(url, data)
+        return self.__post(url, {}, files={'processor_file': process_file})
 
     def process_resource(self, processor_name: str, input_file: str, output_file: str, include_dependencies: list, exclude_dependencies: list, options: dict = {}):
         url = 'process_file/{}'.format(processor_name)
@@ -26,14 +28,18 @@ class RemoteJSClient(object):
     def ding(self):
         return self.__post('ding', {})
 
-    def __post(self, url_relative: str, data: dict):
+    def __post(self, url_relative: str, data: dict, files: dict = None):
         url_absolute = urllib.parse.urljoin(self.url, url_relative)
-        response = self.session.post(url_absolute, json=data, headers=self.headers, timeout=10)
+        response = self.session.post(url_absolute, json=data, headers=self.headers, timeout=10, files=files)
         response_json = json.loads(response.content.decode('utf-8'))
-        if response.status_code == 200:
-            return response_json
-        else:
-            raise ValueError(response_json['message'])
+        try:
+            if response.status_code == 200:
+                return response_json
+            else:
+                raise ValueError(response_json['message'])
+        except BaseException as ex:
+            self.logger.error(ex)
+            raise ex
 
     def close(self):
         self.session.close()

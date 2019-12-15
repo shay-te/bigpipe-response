@@ -14,7 +14,7 @@ django.setup()
 
 settings_file = os.path.join(os.path.realpath(os.getcwd()), 'data', 'bigpipe_settings.py')
 Bigpipe.init(settings_file)
-TestUtils.empty_output_folder(Bigpipe.get().config.RENDERED_OUTPUT_PATH)
+TestUtils.empty_output_folder(Bigpipe.get().config.rendered_output_path)
 
 
 class TestBigpipe(unittest.TestCase):

@@ -114,7 +114,7 @@ class BigpipeProcessorManager {
 
     _storeFileLocally(process_file) {
         return new Promise(function(resolve, reject) {
-            if (process_file && fs.existsSync(process_file) && path.extname(process_file).toLowerCase() == '.js') {
+            if (process_file && fs.existsSync(process_file)) {
                 this._fileHash(process_file).then(function(fileHash) {
                     var registered_process_file = path.join(__dirname, 'registered_processors', fileHash + '.js')
                     if(!fs.existsSync(registered_process_file)) {

@@ -39,18 +39,17 @@ function handleError(next, error) {
     }
     return next(renderError(error.message));
 }
-
 server.post('/ding',
             middlewareValidateRequestToken,
             function (req, res, next) {
 
        res.send(renderMessage('dong, remote server.'));
 });
+
 server.post('/register_processor/:processor_name',
             middlewareValidateRequestToken,
             function (req, res, next) {
-
-    bigpipeProcessorManager.registerProcessor(req.params.processor_name, req.params.process_file).then(function() {
+    bigpipeProcessorManager.registerProcessor(req.params.processor_name, req.files.processor_file.path).then(function() {
         res.send(renderMessage('module registered [' + req.params.processor_name + '] was registered.'));
     }).catch(function(error) {
         return handleError(next, error);

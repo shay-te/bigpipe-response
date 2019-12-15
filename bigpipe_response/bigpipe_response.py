@@ -80,7 +80,7 @@ class BigpipeResponse(StreamingHttpResponse):
         except BaseException as ex:
             self.logger.error("Error handling bigpipe response", exc_info=sys.exc_info())
 
-            if not Bigpipe.get().config.IS_PRODUCTION_MODE: # DEVELOPMENT MODE
+            if not Bigpipe.get().config.is_production_mode: # DEVELOPMENT MODE
                 error_target = 'Error in request source [{}]{}'.format(self.render_source, ', on pagelet target element [{}]'.format(last_pagelet_target) if last_pagelet_target else '')
                 content, js, css = BigpipeDebugger.get_exception_content(error_target, (str(ex.errors) if hasattr(ex, 'errors') else str(ex)), traceback.format_exc())
                 i18n = {}
@@ -186,8 +186,8 @@ class BigpipeResponse(StreamingHttpResponse):
 
     def __get_dependency_as_link(self, bigpipe_processor_name: str, input: str, include_dependencies: list, generate_missing_source: bool):
         output_file = self.__run_processor(bigpipe_processor_name, input, include_dependencies, generate_missing_source=generate_missing_source).output_file
-        static_uri = Bigpipe.get().config.STATIC_URI.strip('/') if Bigpipe.get().config.STATIC_URI else ''
-        output_file = output_file[len(Bigpipe.get().config.RENDERED_OUTPUT_PATH)::].replace('\\', '/')
+        static_uri = Bigpipe.get().config.static_uri.strip('/') if Bigpipe.get().config.static_uri else ''
+        output_file = output_file[len(Bigpipe.get().config.rendered_output_path)::].replace('\\', '/')
         return '{}/{}'.format(static_uri, output_file.strip('/'))
 
     #

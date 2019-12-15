@@ -5,7 +5,7 @@ from bigpipe_response.remote.node_installer import NodeInstaller
 from bigpipe_response.remote.remote_js_client import RemoteJSClient
 from bigpipe_response.remote.remove_js_server import RemoteJsServer
 import socket
-
+from omegaconf import OmegaConf
 
 class RemoteClientServer(object):
 
