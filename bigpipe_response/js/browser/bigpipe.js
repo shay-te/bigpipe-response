@@ -38,7 +38,7 @@ window.renderPagelet = function(p) {
             head.appendChild(script);
         }
         if(p.remove) {
-            var script = document.getElementById('script_' + p.id);
+            var script = document.getElementById('script_' + p.target);
             if(script) {
                 script.parentElement.removeChild(script);
             }

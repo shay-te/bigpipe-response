@@ -213,8 +213,14 @@ class BigpipeResponse(StreamingHttpResponse):
             result['js'] = js
         if i18n:
             result['i18n'] = i18n
+        if Bigpipe.get().config.IS_PRODUCTION_MODE:
+            result['remove'] = True
 
-        return '\n<script>\nrenderPagelet({})\n</script>\n'.format(json.dumps(result))
+        return """
+            <script id='{}'>
+                renderPagelet({})
+            </script>
+        """.format('script_{}'.format(paglet_target), json.dumps(result))
 
     #
     #  Bigpipe call processors
