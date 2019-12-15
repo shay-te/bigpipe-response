@@ -96,14 +96,14 @@ class ProcessorsManager(object):
                                           self.remote_client_server,
                                           self.conf.JS_PROCESSOR_HANDLER_PATH,
                                           self.conf.IS_PRODUCTION_MODE,
-                                          list(self.conf.CLIENT_BASE_PATH),
+                                          list(self.conf.JS_SOURCE_PATH),
                                           self.output_dir,
                                           list(self.conf.JS_PROCESSOR_SOURCE_EXT),
                                           self.conf.JS_PROCESSOR_TARGET_EXT)
 
         css_processor = CSSProcessor(CSS_PROCESSOR_NAME,
                                      self.conf.IS_PRODUCTION_MODE,
-                                     list(self.conf.CLIENT_BASE_PATH),
+                                     list(self.conf.CSS_SOURCE_PATH),
                                      self.output_dir,
                                      list(self.conf.CSS_PROCESSOR_SOURCE_EXT),
                                      self.conf.CSS_PROCESSOR_TARGET_EXT)

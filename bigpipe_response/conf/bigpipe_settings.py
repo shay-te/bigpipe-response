@@ -35,12 +35,19 @@ class BigpipeSettings:
         self.__validate_settings()
 
     def __validate_settings(self):
-        if self.CLIENT_BASE_PATH and not isinstance(self.CLIENT_BASE_PATH, list):
-            raise InvalidConfiguration('CLIENT_BASE_PATH must be supplied as list')
+        if self.JS_SOURCE_PATH and not isinstance(self.JS_SOURCE_PATH, list):
+            raise InvalidConfiguration('JS_SOURCE_PATH must be supplied as list')
 
-        for client_base_path in self.CLIENT_BASE_PATH:
-            if not os.path.exists(client_base_path):
-                raise ValueError('CLIENT_BASE_PATH directory dose not exists. [{}]'.format(client_base_path))
+        for source_base_path in self.JS_SOURCE_PATH:
+            if not os.path.exists(source_base_path):
+                raise ValueError('JS_SOURCE_PATH directory dose not exists. [{}]'.format(source_base_path))
+
+        if self.CSS_SOURCE_PATH and not isinstance(self.CSS_SOURCE_PATH, list):
+            raise InvalidConfiguration('JS_SOURCE_PATH must be supplied as list')
+
+        for source_base_path in self.CSS_SOURCE_PATH:
+            if not os.path.exists(source_base_path):
+                raise ValueError('CSS_SOURCE_PATH directory dose not exists. [{}]'.format(source_base_path))
 
         if not self.RENDERED_OUTPUT_PATH or not os.path.isdir(self.RENDERED_OUTPUT_PATH):
             raise InvalidConfiguration('RENDERED_OUTPUT_PATH need to be a an exists path')
