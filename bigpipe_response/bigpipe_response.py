@@ -187,6 +187,8 @@ class BigpipeResponse(StreamingHttpResponse):
             return self.__get_file_content(css_dependencies_result.output_file), include_dependencies
         else:
             return '', []
+
+
     #
     # Links
     #

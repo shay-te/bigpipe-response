@@ -1,7 +1,5 @@
 import logging
 import pkg_resources
-
-
 from bigpipe_response.processors.base_file_processor import BaseFileProcessor
 from bigpipe_response.remote.remote_client_server import RemoteClientServer
 
@@ -21,7 +19,6 @@ class RemoteJsProcessor(BaseFileProcessor):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.processor_name = processor_name
         self.remote_client_server = remote_client_server
-        self.processor_js_handler_path = processor_js_resource
 
     @staticmethod
     def build_js_resource(resource):

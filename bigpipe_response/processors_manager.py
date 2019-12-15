@@ -3,7 +3,6 @@ import os
 
 from omegaconf import OmegaConf
 
-from bigpipe_response.conf.bigpipe_settings import BigpipeSettings
 from bigpipe_response.processors.base_file_processor import BaseFileProcessor
 from bigpipe_response.processors.i18n_processor import I18nProcessor
 from bigpipe_response.processors.remote_js_processor import RemoteJsProcessor
@@ -14,7 +13,7 @@ from django.views.i18n import JavaScriptCatalog, get_formats
 
 class ProcessorsManager(object):
 
-    def __init__(self, conf: BigpipeSettings, processors: list = []):
+    def __init__(self, conf, processors: list = []):
         self.conf = conf
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -33,7 +32,7 @@ class ProcessorsManager(object):
         self.__install_javascript_dependencies(javascript_folder)
         self.remote_client_server = RemoteClientServer(javascript_folder, self.conf.is_production_mode, self.conf.js_server_port_start, self.conf.js_server_port_count, extra_node_packages=OmegaConf.to_container(self.conf.js_server_extra_node_packages, resolve=True))
 
-        # walk on dependencies
+        # Bundle dependencies
         self.logger.info('Settings up processors.')
         self.__processors = {**self.__generate_default_processors(), **{processor.processor_name: processor for processor in processors}}
         for processor in processors:

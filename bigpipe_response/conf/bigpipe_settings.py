@@ -1,30 +1,12 @@
 import os
 
-from omegaconf import ListConfig, OmegaConf
+import hydra
+from omegaconf import OmegaConf
 from pkg_resources import resource_exists
 
 from bigpipe_response.exceptions import InvalidConfiguration
 from bigpipe_response.javascript_dom_bind.javascript_dom_bind import JavascriptDOMBind
 from bigpipe_response.processors.remote_js_processor import RemoteJsProcessor
-
-
-
-def get_class(path):
-    try:
-        from importlib import import_module
-
-        module_path, _, class_name = path.rpartition(".")
-        mod = import_module(module_path)
-        try:
-            klass = getattr(mod, class_name)
-        except AttributeError:
-            raise ImportError(
-                "Class {} is not in module {}".format(class_name, module_path)
-            )
-        return klass
-    except ValueError as e:
-        raise e
-
 
 class BigpipeSettings:
 
@@ -70,7 +52,7 @@ class BigpipeSettings:
         if not config.js_processor_handler_path or not resource_exists(path, resource):
             raise InvalidConfiguration('js_processor_handler_path must be set to a javascript file')
 
-        if JavascriptDOMBind not in get_class(config.js_dom_bind).__bases__:
+        if JavascriptDOMBind not in hydra.utils.get_class(config.js_dom_bind).__bases__:
             raise InvalidConfiguration('js_dom_bind must be set and instance of javascriptdombind')
 
         if not config.css_processor_name:
