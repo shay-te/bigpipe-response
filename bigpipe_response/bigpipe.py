@@ -15,9 +15,9 @@ class Bigpipe(object):
     __instance = None
 
     def __init__(self, config: OmegaConf, processors: list = []):
-        # self.conf = config
-        self.conf = OmegaConf.merge(OmegaConf.load(os.path.normpath(os.path.join(os.path.dirname(__file__), 'conf/default_config.yaml'))), config)
-        BigpipeSettings.validate_settings(self.conf)
+        BigpipeSettings.validate_settings(config)
+        
+        self.conf = config
         self.logger = logging.getLogger(self.__class__.__name__)
 
         # set render default options
