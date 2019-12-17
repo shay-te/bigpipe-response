@@ -20,3 +20,6 @@ __pycache__/
 # TESTS
 /tests/data_output
 
+bigpipe_response.egg-info/
+build/
+dist/

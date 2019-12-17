@@ -12,11 +12,12 @@ setuptools.setup(
    long_description_content_type="text/markdown",
    url="https://github.com/shacoshe/bigpipe-response",
    author='Shay Tessler',
-   author_email='shay.te@gmail.com ',
+   author_email='shay.te@gmail.com',
    packages=setuptools.find_packages(),
+   license="BSD 3-Clause License",
    classifiers=[
       "Programming Language :: Python :: 3",
-      "License :: BSD 3-Clause License",
+      "License :: OSI Approved :: BSD License",
       "Operating System :: OS Independent",
    ],
    python_requires='>=3.7'

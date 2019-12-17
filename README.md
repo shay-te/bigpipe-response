@@ -46,7 +46,7 @@ and using [omegaconf](https://github.com/omry/omegaconf) for configuration
 
 ### Installing
 
-    pip install bigpipe_response
+    pip install bigpipe-response
 
 
 ## Contributing
