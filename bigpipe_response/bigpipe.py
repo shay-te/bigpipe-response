@@ -8,7 +8,7 @@ from omegaconf import OmegaConf
 from bigpipe_response.bigpipe_render_options import BigpipeRenderOptions
 from bigpipe_response.conf.bigpipe_settings import BigpipeSettings
 from bigpipe_response.processors_manager import ProcessorsManager
-from hydra import utils
+
 
 class Bigpipe(object):
 
@@ -16,26 +16,34 @@ class Bigpipe(object):
 
     def __init__(self, config: OmegaConf, processors: list = []):
         BigpipeSettings.validate_settings(config)
-        
+
         self.conf = config
         self.logger = logging.getLogger(self.__class__.__name__)
 
         # set render default options
-        self.default_render_option = BigpipeRenderOptions(js_processor_name=self.conf.js_processor_name,
-                                                          css_processor_name=self.conf.css_processor_name,
-                                                          i18n_processor_name=self.conf.i18n_processor_name,
-                                                          js_link_bundle_dependencies=self.conf.js_link_bundle_dependencies,
-                                                          css_link_bundle_dependencies=self.conf.css_link_bundle_dependencies,
-                                                          css_complete_dependencies_by_js=self.conf.css_complete_dependencies_by_js,
-                                                          javascript_dom_bind=hydra.utils.get_class(self.conf.js_dom_bind)())
-
+        self.default_render_option = BigpipeRenderOptions(
+            js_processor_name=self.conf.processors.js.name,
+            css_processor_name=self.conf.processors.css.name,
+            i18n_processor_name=self.conf.processors.i18n.name,
+            js_link_bundle_dependencies=self.conf.processors.js.bundle_link_dependencies,
+            css_link_bundle_dependencies=self.conf.processors.css.bundle_link_dependencies,
+            css_complete_dependencies_by_js=self.conf.processors.css.complete_dependencies_by_js,
+            javascript_dom_bind=hydra.utils.get_class(
+                self.conf.processors.js.javascript_dom_bind
+            )(),
+        )
 
         # processors manager
         self.processors_manager = ProcessorsManager(self.conf, processors)
 
         # install js dependencies
-        javascript_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'js')
-        copyfile(os.path.join(javascript_folder, 'browser', 'bigpipe.js'), os.path.join(self.conf.rendered_output_path, 'bigpipe.js'))
+        javascript_folder = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "js"
+        )
+        copyfile(
+            os.path.join(javascript_folder, "browser", "bigpipe.js"),
+            os.path.join(self.conf.rendered_output_path, "bigpipe.js"),
+        )
 
     @staticmethod
     def init(config: OmegaConf, processors: list = []):
@@ -45,7 +53,7 @@ class Bigpipe(object):
     @staticmethod
     def get():
         if Bigpipe.__instance is None:
-            raise NameError('Bigpipe not initialized')
+            raise NameError("Bigpipe not initialized")
         return Bigpipe.__instance
 
     def shutdown(self):

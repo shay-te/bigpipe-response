@@ -5,3 +5,4 @@ ansi2html==1.5.2
 polib==1.1.0
 requests==2.22.0
 omegaconf==1.4.0
+pre-commit

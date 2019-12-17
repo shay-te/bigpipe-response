@@ -3,17 +3,21 @@ import unittest
 from django.http import HttpResponse
 from django.utils.translation import activate
 from django.utils.translation.trans_real import DjangoTranslation
+from omegaconf import OmegaConf
+
 from bigpipe_response.bigpipe import Bigpipe
 from bigpipe_response.bigpipe_response import BigpipeResponse
 from tests.test_utils import TestUtils
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'data.settings')
-
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.data.settings')
 import django
 django.setup()
 
-settings_file = os.path.join(os.path.realpath(os.getcwd()), 'data', 'bigpipe_settings.py')
-Bigpipe.init(settings_file)
+tests_path = os.path.dirname(os.path.abspath(__file__))
+OmegaConf.clear_resolvers()
+OmegaConf.register_resolver('full_path', lambda sub_path: os.path.join(tests_path, sub_path))
+config = OmegaConf.merge(OmegaConf.load(os.path.join(tests_path, '..', 'bigpipe_response', 'conf', 'bigpipe.yaml')), OmegaConf.load(os.path.join(tests_path, 'data', 'bigpipe_settings.yaml')))
+Bigpipe.init(config.bigpipe)
 TestUtils.empty_output_folder(Bigpipe.get().config.rendered_output_path)
 
 
@@ -72,3 +76,5 @@ class TestBigpipe(unittest.TestCase):
         self.assertEqual(response_str_he[0:5], '<html')
         self.assertGreater(response_str_he.index(prop_data_string_he), 10)
         self.assertGreater(response_str_he.index(i18n_string_he), 10)
+
+

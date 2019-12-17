@@ -1,0 +1,10 @@
+-   repo: local
+    hooks:
+    -   id: tests
+        name: run tests
+        entry: python -m unittest discover
+        language: system
+        types: [python]
+        stages: [commit]
+        pass_filenames: false
+        args: ["-p test_*.py"]

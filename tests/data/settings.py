@@ -136,6 +136,7 @@ LANGUAGES = (
     ('he', _('Hebrew')),
 )
 TIME_ZONE = 'UTC'
+
 LOCALE_PATHS = [
     os.path.join(os.path.dirname(os.path.realpath(__file__)), 'locale')
 ]
