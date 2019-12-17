@@ -4,9 +4,6 @@ import setuptools
 with open("README.md", "r") as fh:
    long_description = fh.read()
 
-with open('requirements.txt') as f:
-   requirements = f.read().splitlines()
-
 setuptools.setup(
    name='bigpipe_response',
    version=bigpipe_response.__version__,
@@ -16,10 +13,10 @@ setuptools.setup(
    url="https://github.com/shacoshe/bigpipe-response",
    author='Shay Tessler',
    author_email='shay.te@gmail.com ',
-   packages=requirements,
+   packages=setuptools.find_packages(),
    classifiers=[
       "Programming Language :: Python :: 3",
-      "License :: OSI Approved :: MIT License",
+      "License :: BSD 3-Clause License",
       "Operating System :: OS Independent",
    ],
    python_requires='>=3.7'

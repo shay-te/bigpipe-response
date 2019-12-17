@@ -2,9 +2,9 @@ import logging
 import os
 from shutil import copyfile
 
-import hydra
 from omegaconf import OmegaConf
 
+from bigpipe_response import utils
 from bigpipe_response.bigpipe_render_options import BigpipeRenderOptions
 from bigpipe_response.conf.bigpipe_settings import BigpipeSettings
 from bigpipe_response.processors_manager import ProcessorsManager
@@ -28,7 +28,7 @@ class Bigpipe(object):
             js_link_bundle_dependencies=self.conf.processors.js.bundle_link_dependencies,
             css_link_bundle_dependencies=self.conf.processors.css.bundle_link_dependencies,
             css_complete_dependencies_by_js=self.conf.processors.css.complete_dependencies_by_js,
-            javascript_dom_bind=hydra.utils.get_class(self.conf.processors.js.javascript_dom_bind)(),
+            javascript_dom_bind=utils.get_class(self.conf.processors.js.javascript_dom_bind)(),
         )
 
         # processors manager
@@ -72,3 +72,4 @@ class Bigpipe(object):
                     setattr(render_option, key, value)
             return render_option
         return self.default_render_option
+
