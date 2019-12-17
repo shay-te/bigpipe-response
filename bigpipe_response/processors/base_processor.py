@@ -26,7 +26,7 @@ class BaseProcessor(object):
         pass
 
     @abstractmethod
-    def render_resource(self, input_file, context, i18n):
+    def render_resource(self, input_file: str, context: dict, i18n: dict):
         pass
 
     def validate_input(self, source: str):
