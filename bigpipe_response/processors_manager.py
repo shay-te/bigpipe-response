@@ -17,9 +17,7 @@ class ProcessorsManager(object):
         self.logger = logging.getLogger(self.__class__.__name__)
 
         # set output directory
-        self.output_dir = os.path.normpath(
-            os.path.join(self.conf.rendered_output_path, "component_cache")
-        )
+        self.output_dir = os.path.normpath(os.path.join(self.conf.rendered_output_path, "component_cache"))
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
 
@@ -29,18 +27,14 @@ class ProcessorsManager(object):
 
         # install js dependencies
         self.logger.info("Installing javascript dependencies.")
-        javascript_folder = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "js"
-        )
+        javascript_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "js")
         self.__install_javascript_dependencies(javascript_folder)
         self.remote_client_server = RemoteClientServer(
             javascript_folder,
             self.conf.is_production_mode,
             self.conf.processors.js.remote_port_start,
             self.conf.processors.js.remote_port_count,
-            extra_node_packages=OmegaConf.to_container(
-                self.conf.processors.js.remote_extra_node_packages, resolve=True
-            ),
+            extra_node_packages=OmegaConf.to_container(self.conf.processors.js.remote_extra_node_packages, resolve=True),
         )
 
         # Bundle dependencies
@@ -51,40 +45,21 @@ class ProcessorsManager(object):
         }
         for processor in processors:
             if not isinstance(processor, BaseFileProcessor):
-                raise ValueError(
-                    "processor must be a baseclass of 'BaseFileProcessor'. Got: {} ".format(
-                        processor.__class__.__name__
-                    )
-                )
+                raise ValueError("processor must be a baseclass of 'BaseFileProcessor'. Got: {} ".format(processor.__class__.__name__))
 
         # start remote js server
         self.logger.info("Starting remote javascript server.")
-        self.remote_client_server.set_processors(
-            [
-                processor
-                for proc_name, processor in self.__processors.items()
-                if isinstance(processor, RemoteJsProcessor)
-            ]
-        )
+        self.remote_client_server.set_processors([processor for proc_name, processor in self.__processors.items() if isinstance(processor, RemoteJsProcessor)])
         self.remote_client_server.start()
 
     def filter_unregistered_dependencies(self, proc_name: str, dependencies: list):
         if not proc_name in self.__processors:
-            raise ValueError(
-                "processor by name [{}] dose not exists.".format(proc_name)
-            )
+            raise ValueError("processor by name [{}] dose not exists.".format(proc_name))
         if not isinstance(self.__processors[proc_name], BaseFileProcessor):
-            raise ValueError(
-                "processor by name [{}] must be of type BaseFileProcessor.".format(
-                    proc_name
-                )
+            raise ValueError("processor by name [{}] must be of type BaseFileProcessor.".format(proc_name)
             )
         proc = self.__processors[proc_name]
-        return [
-            dependency
-            for dependency in dependencies
-            if proc.is_component_registered(dependency)
-        ]
+        return [dependency for dependency in dependencies if proc.is_component_registered(dependency)]
 
     def run_processor(
         self,
@@ -96,9 +71,7 @@ class ProcessorsManager(object):
         generate_missing_source: bool = False,
     ):
         if not proc_name in self.__processors:
-            raise ValueError(
-                "processor by name [{}] dose not exists.".format(proc_name)
-            )
+            raise ValueError("processor by name [{}] dose not exists.".format(proc_name))
 
         processor = self.__processors[proc_name]
         if generate_missing_source:
@@ -109,32 +82,19 @@ class ProcessorsManager(object):
             # 4 process the source
 
             if not isinstance(processor, BaseFileProcessor):
-                raise ValueError(
-                    "generate_missing_source option supports only BaseFileProcessor"
-                )
+                raise ValueError("generate_missing_source option supports only BaseFileProcessor")
 
             if not processor.is_component_registered(input):
                 if not include_dependencies:
-                    raise ValueError(
-                        "generate_missing_source was set and include_dependencies is empty, nothing to do"
-                    )
+                    raise ValueError("generate_missing_source was set and include_dependencies is empty, nothing to do")
 
-                processor.register_component(
-                    input,
-                    self.__generate_processor_input(
-                        proc_name, "{}.{}".format(input, processor.target_ext)
-                    ),
-                )
+                processor.register_component(input, self.__generate_processor_input(proc_name, "{}.{}".format(input, processor.target_ext)),)
 
-        return self.__processors[proc_name].run(
-            input, options, include_dependencies, exclude_dependencies
-        )
+        return self.__processors[proc_name].run(input, options, include_dependencies, exclude_dependencies)
 
     def render_processor(self, proc_name: str, input: str, context: dict, i18n: dict):
         if not proc_name in self.__processors:
-            raise ValueError(
-                "processor by name [{}] dose not exists.".format(proc_name)
-            )
+            raise ValueError("processor by name [{}] dose not exists.".format(proc_name))
         return self.__processors[proc_name].render(input, context, i18n)
 
     def shutdown(self):
@@ -142,9 +102,7 @@ class ProcessorsManager(object):
             try:
                 self.__processors[key]._shutdown()
             except:
-                self.logger.error(
-                    "Error shutting fown processor by name [{}]".format(key)
-                )
+                self.logger.error("Error shutting fown processor by name [{}]".format(key))
         self.remote_client_server.shutdown()
 
     def __generate_default_processors(self):
@@ -160,6 +118,7 @@ class ProcessorsManager(object):
             self.output_dir,
             list(self.conf.processors.js.source_ext),
             self.conf.processors.js.target_ext,
+            exclude_dir='node_modules'
         )
 
         css_processor = CSSProcessor(
@@ -185,9 +144,7 @@ class ProcessorsManager(object):
             with open(jsi18n_file, "wb") as jsi18n_file:
                 file_content = (
                     JavaScriptCatalog()
-                    .render_to_response(
-                        {"catalog": {}, "formats": get_formats(), "plural": {}}
-                    )
+                    .render_to_response({"catalog": {}, "formats": get_formats(), "plural": {}})
                     .content
                 )
                 jsi18n_file.write(file_content)

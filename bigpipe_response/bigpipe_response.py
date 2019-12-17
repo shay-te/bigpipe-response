@@ -188,7 +188,6 @@ class BigpipeResponse(StreamingHttpResponse):
         else:
             return '', []
 
-
     #
     # Links
     #
@@ -196,7 +195,8 @@ class BigpipeResponse(StreamingHttpResponse):
         if not inputs:
             return []
         if bundle_dependencies:
-            return [self.__get_dependency_as_link(bigpipe_processor_name, 'bundle_{}'.format(self.render_source), inputs, generate_missing_source=True)]
+            input_name = 'bundle_{}'.format(inputs[0] if len(inputs) == 1 else self.render_source)
+            return [self.__get_dependency_as_link(bigpipe_processor_name, input_name, inputs, generate_missing_source=True)]
         else:
             return [self.__get_dependency_as_link(bigpipe_processor_name, input, [], generate_missing_source=False) for input in inputs]
 

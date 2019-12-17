@@ -28,18 +28,14 @@ class Bigpipe(object):
             js_link_bundle_dependencies=self.conf.processors.js.bundle_link_dependencies,
             css_link_bundle_dependencies=self.conf.processors.css.bundle_link_dependencies,
             css_complete_dependencies_by_js=self.conf.processors.css.complete_dependencies_by_js,
-            javascript_dom_bind=hydra.utils.get_class(
-                self.conf.processors.js.javascript_dom_bind
-            )(),
+            javascript_dom_bind=hydra.utils.get_class(self.conf.processors.js.javascript_dom_bind)(),
         )
 
         # processors manager
         self.processors_manager = ProcessorsManager(self.conf, processors)
 
         # install js dependencies
-        javascript_folder = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "js"
-        )
+        javascript_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "js")
         copyfile(
             os.path.join(javascript_folder, "browser", "bigpipe.js"),
             os.path.join(self.conf.rendered_output_path, "bigpipe.js"),
