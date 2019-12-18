@@ -47,14 +47,14 @@ class BigpipeSettings:
             raise InvalidConfiguration('config.processors.js.target_ext must be set')
 
         if not config.processors.js.javascript_handler.strip().lower().endswith('.js'):
-            raise InvalidConfiguration('js_processor_handler_path must be with js extension.')
+            raise InvalidConfiguration('config.processors.js.javascript_handler must be with js extension.')
 
         if not config.processors.js.javascript_handler:
             raise InvalidConfiguration('config.processors.js.javascript_handler must be set')
 
         path, resource = RemoteJsProcessor.build_js_resource(config.processors.js.javascript_handler)
         if not resource_exists(path, resource):
-            raise InvalidConfiguration('js_processor_handler_path must be set to a javascript file')
+            raise InvalidConfiguration('config.processors.js.javascript_handler must be set to a javascript file')
 
         if JavascriptDOMBind not in utils.get_class(config.processors.js.javascript_dom_bind).__bases__:
             raise InvalidConfiguration('config.processors.js.javascript_dom_bind must be set and instance of JavascriptDOMBind')

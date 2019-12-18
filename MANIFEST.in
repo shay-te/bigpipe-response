@@ -1,0 +1,20 @@
+include requirements.txt
+include LICENSE
+include README.md
+
+# Include configuration
+include bigpipe_response/conf/*.yaml
+
+# Include debugger files
+include bigpipe_response/debugger/*.css
+include bigpipe_response/debugger/*.html
+
+# Include javascript
+recursive-include bigpipe_response/processors *.js
+recursive-include bigpipe_response/js *
+
+# Exclude node installation fils
+recursive-exclude bigpipe_response/js/registered_processors *.js
+exclude bigpipe_response/js/package-lock.json
+recursive-exclude bigpipe_response/js/node_modules *
+recursive-exclude scripts *
