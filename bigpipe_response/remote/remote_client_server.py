@@ -1,6 +1,8 @@
 import logging
 import traceback
 
+import pkg_resources
+
 from bigpipe_response.remote.node_installer import NodeInstaller
 from bigpipe_response.remote.remote_js_client import RemoteJSClient
 from bigpipe_response.remote.remove_js_server import RemoteJsServer
@@ -37,18 +39,29 @@ class RemoteClientServer(object):
         ] + extra_node_packages
         NodeInstaller.get().install_javascript_dependencies(packages)
 
-    def set_processors(self, processors):
-        if not processors:
+    def register_processor_handler(self, processor_name, resource_str):
+        if not processor_name:
             raise ValueError("processor cannot be null")
-        self._processors = {
-            processor.processor_name: processor for processor in processors
-        }
+        if processor_name in self._processors.keys():
+            raise ValueError("processor already registered")
+
+        self._processors[processor_name] = self.__get_js_resource_as_string(processor_name, resource_str)
+
+    def __get_js_resource_as_string(self, processor_name, resourse_str):
+        if not resourse_str:
+            raise ValueError('processor_js_resource must be set')
+
+        arr = resourse_str.rsplit('.', 2)
+        resource_path = arr[0]
+        resource_name = '{}.{}'.format(arr[1], arr[2])
+        if not pkg_resources.resource_exists(resource_path, resource_name):
+            raise ValueError('processor_js_resource must dose not exists')
+
+        return pkg_resources.resource_string(resource_path, resource_name)
 
     def __send_register_processors(self):
-        for processor_name, processor in self._processors.items():
-            self.remote_js_client.register_processor(
-                processor_name, processor.get_processor_js_as_string()
-            )
+        for processor_name, javascript_code in self._processors.items():
+            self.remote_js_client.register_processor(processor_name, javascript_code)
 
     def send_process_file(
         self,
@@ -103,17 +116,11 @@ class RemoteClientServer(object):
                 try:
                     token = remote_js_server.start_server(port)
                     self.remote_js_server = remote_js_server
-                    self.remote_js_client = RemoteJSClient(
-                        "http://localhost:{}".format(port), token
-                    )
+                    self.remote_js_client = RemoteJSClient("http://localhost:{}".format(port), token)
                     self.__send_register_processors()
                     return
                 except BaseException as ex:
-                    self.logger.error(
-                        "Available port found ({}), But unable to start server. Error: \n{}".format(
-                            port, traceback.format_exc()
-                        )
-                    )
+                    self.logger.error("Available port found ({}), But unable to start server. Error: \n{}".format(port, traceback.format_exc()))
                     port_scan_start = port_scan_start + 1
             else:
                 break

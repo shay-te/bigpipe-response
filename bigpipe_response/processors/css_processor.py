@@ -1,13 +1,14 @@
 import os
 import sass
+
+from bigpipe_response.bigpipe import Bigpipe
 from bigpipe_response.processors.base_file_processor import BaseFileProcessor
 
 
 class CSSProcessor(BaseFileProcessor):
 
-    def __init__(self, processor_name: str, is_production: bool, code_base_directories: list, output_directory: str, source_ext_list: list, target_ext: str):
-        BaseFileProcessor.__init__(self, processor_name, is_production, code_base_directories, output_directory, source_ext_list, target_ext, 'node_modules')
-        self.is_production = is_production
+    def __init__(self, processor_name: str, code_base_directories: list, source_ext_list: list, target_ext: str):
+        BaseFileProcessor.__init__(self, processor_name, code_base_directories, source_ext_list, target_ext, 'node_modules')
         self.include_paths = self.__generate_include_paths()
 
     def process_resource(self, input_file: str, output_file: str, include_dependencies: list, exclude_dependencies: list, options: dict = {}):
@@ -20,7 +21,7 @@ class CSSProcessor(BaseFileProcessor):
                 return []
             return [(path, )]
 
-        if not self.is_production:  # on development mode files may change
+        if not Bigpipe.get().config.is_production_mode:  # on development mode files may change
             self.include_paths = self.__generate_include_paths()
 
         import_full_paths, import_paths = [input_file], []
@@ -32,11 +33,10 @@ class CSSProcessor(BaseFileProcessor):
         source_list = []
         for full_path in list(set(import_full_paths)):
             source_list.append('@import \'{}\';'.format(full_path.replace('\\', '/')))  # replace case of windows
-
         compiled = sass.compile(string=''.join(source_list),
                                 include_paths=import_paths + self.include_paths,
                                 importers=((0, importer_returning_one_argument,),),
-                                output_style='compressed' if self.is_production else 'expanded')
+                                output_style='compressed' if Bigpipe.get().config.is_production_mode else 'expanded')
 
         fp = open(output_file, "w", encoding='utf-8')
         fp.write(compiled)

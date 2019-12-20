@@ -5,6 +5,8 @@ from abc import abstractmethod
 
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
+
+from bigpipe_response.bigpipe import Bigpipe
 from bigpipe_response.decorators import Debounce
 from bigpipe_response.processors.base_processor import BaseProcessor
 from bigpipe_response.processors.processor_result import ProcessorResult
@@ -13,8 +15,8 @@ from bigpipe_response.processors.processor_result import ProcessorResult
 class BaseFileProcessor(BaseProcessor):
 
     # example values: source_ext: scss, target_ext: css
-    def __init__(self, processor_name: str, is_production: bool, code_base_directories: list, output_directory: str, source_ext: list, target_ext: str, exclude_dir=None):
-        BaseProcessor.__init__(self, processor_name, is_production, output_directory)
+    def __init__(self, processor_name: str, code_base_directories: list, source_ext: list, target_ext: str, exclude_dir=None):
+        BaseProcessor.__init__(self, processor_name, target_ext)
 
         if not source_ext or not target_ext:
             raise ValueError('source and target must be set ')
@@ -41,7 +43,7 @@ class BaseFileProcessor(BaseProcessor):
         for code_base_directory in code_base_directories:
             self.__scan_folder(code_base_directory)
 
-        if not self.is_production:
+        if not Bigpipe.get().config.is_production_mode:
             self.observer = Observer()
             for code_base_directory in code_base_directories:
                 self.observer.schedule(SourceChangesHandler(self), path=code_base_directory, recursive=True)
@@ -63,7 +65,7 @@ class BaseFileProcessor(BaseProcessor):
     def run(self, source: str, options: dict = {}, include_dependencies: list = [], exclude_dependencies: list = []):
         super().run(source, options, include_dependencies, exclude_dependencies)
         input_file = self._component_to_file[source]
-        output_file = self.build_output_file_path(os.path.basename(input_file), self.target_ext, include_dependencies, exclude_dependencies)
+        output_file = self.build_output_file_path(os.path.basename(input_file), include_dependencies, exclude_dependencies)
 
         if output_file not in self._output_file_to_effected_files or not os.path.isfile(output_file):
             effected_files = self.process_resource(input_file, output_file, include_dependencies, exclude_dependencies, options)
@@ -71,7 +73,7 @@ class BaseFileProcessor(BaseProcessor):
         else:
             effected_files = self._output_file_to_effected_files[output_file]
 
-        if not self.is_production:
+        if not Bigpipe.get().config.is_production_mode:
             self._processed_files.append(output_file)
         return ProcessorResult(effected_files, output_file)
 

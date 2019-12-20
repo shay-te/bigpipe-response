@@ -2,6 +2,12 @@ bigpipe:
   rendered_output_path: null
   static_uri: null
   is_production_mode: null
+  rendered_output_container: component_cache
+
+  remote:
+    port_start: 7480
+    port_count: 10
+    extra_node_packages: []
 
   processors:
 
@@ -15,9 +21,12 @@ bigpipe:
       javascript_handler: bigpipe_response.processors.RollupReactProcessor.js
       javascript_dom_bind: bigpipe_response.javascript_dom_bind.react_dom_bind.ReactDomBind
       bundle_link_dependencies: true
-      remote_port_start: 7480
-      remote_port_count: 10
-      remote_extra_node_packages: []
+
+
+    js_modules:
+      name: js_modules
+      target_ext: js
+      javascript_handler: bigpipe_response.processors.WebpackModuleProcessor.js
 
     css:
       name: css

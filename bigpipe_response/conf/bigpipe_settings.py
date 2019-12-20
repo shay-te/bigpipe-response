@@ -5,11 +5,20 @@ from pkg_resources import resource_exists
 
 from bigpipe_response import utils
 from bigpipe_response.exceptions import InvalidConfiguration
-from bigpipe_response.javascript_dom_bind.javascript_dom_bind import JavascriptDOMBind
-from bigpipe_response.processors.remote_js_processor import RemoteJsProcessor
 
 
 class BigpipeSettings:
+
+    @staticmethod
+    def validate_folder_name(folder_name, property_name):
+        if not folder_name or not isinstance(folder_name, str):
+            raise InvalidConfiguration('{}} cannot be blank'.format(property_name))
+
+        keep_characters = ('_')
+        fixed_folder_name = "".join(c for c in folder_name if c.isalnum() or c in keep_characters).rstrip()
+        if fixed_folder_name != folder_name:
+            raise InvalidConfiguration('{}} must be set to a valid folder name. no spaces, dots are allowed. suggestions: {}'.format(property_name, fixed_folder_name))
+
     @staticmethod
     def validate_settings(config):
         js_source_path = OmegaConf.to_container(config.processors.js.source_path, resolve=True)
@@ -32,6 +41,8 @@ class BigpipeSettings:
         if not config.rendered_output_path or not os.path.isdir(config.rendered_output_path):
             raise InvalidConfiguration('rendered_output_path need to be a an exists path')
 
+        BigpipeSettings.validate_folder_name(config.rendered_output_container, 'rendered_output_container')
+
         if not isinstance(config.is_production_mode, bool):
             raise InvalidConfiguration('is_production_mode must be of type boolean')
 
@@ -52,17 +63,20 @@ class BigpipeSettings:
         if not config.processors.js.javascript_handler:
             raise InvalidConfiguration('config.processors.js.javascript_handler must be set')
 
-        path, resource = RemoteJsProcessor.build_js_resource(config.processors.js.javascript_handler)
-        if not resource_exists(path, resource):
-            raise InvalidConfiguration('config.processors.js.javascript_handler must be set to a javascript file')
+        from bigpipe_response.javascript_dom_bind.javascript_dom_bind import JavascriptDOMBind
+        # from bigpipe_response.processors.remote_js_processor import RemoteJsProcessor
+        #
+        # path, resource = RemoteJsProcessor.build_js_resource(config.processors.js.javascript_handler)
+        # if not resource_exists(path, resource):
+        #     raise InvalidConfiguration('config.processors.js.javascript_handler must be set to a javascript file')
 
         if JavascriptDOMBind not in utils.get_class(config.processors.js.javascript_dom_bind).__bases__:
             raise InvalidConfiguration('config.processors.js.javascript_dom_bind must be set and instance of JavascriptDOMBind')
 
-        if not config.processors.js.remote_port_start:
+        if not config.remote.port_start:
             raise InvalidConfiguration('config.processors.js.remote_port_start must be set to a port number')
 
-        if not config.processors.js.remote_port_count:
+        if not config.remote.port_count:
             raise InvalidConfiguration('config.processors.js.remote_port_count must be set to number of ports to scan')
 
         if not config.processors.css.name:

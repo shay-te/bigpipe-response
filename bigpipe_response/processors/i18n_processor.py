@@ -9,9 +9,8 @@ from bigpipe_response.processors.processor_result import ProcessorResult
 
 class I18nProcessor(BaseProcessor):
 
-    def __init__(self, processor_name: str, output_directory: str):
-        BaseProcessor.__init__(self, processor_name, True, output_directory)
-        self.target_ext = 'json'
+    def __init__(self, processor_name: str):
+        BaseProcessor.__init__(self, processor_name, 'json')
 
     def run(self, source: str, options: dict = {}, include_dependencies: list = [], exclude_dependencies: list = []):
         super().run(source, options, include_dependencies, exclude_dependencies)
@@ -21,7 +20,7 @@ class I18nProcessor(BaseProcessor):
         if 'language' not in options or not options['language']: raise ValueError('I18nProcessor expect options to contain \'language\' ')
 
         input_file = '{}_{}'.format(source.replace('.', '_'), options['language'])
-        output_file = self.build_output_file_path(input_file, self.target_ext, include_dependencies, exclude_dependencies)
+        output_file = self.build_output_file_path(input_file, include_dependencies, exclude_dependencies)
         if not os.path.isfile(output_file):
             self.process_resource(source, output_file, include_dependencies, exclude_dependencies, options)
 

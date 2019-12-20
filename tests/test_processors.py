@@ -12,7 +12,11 @@ tests_path = os.path.dirname(os.path.abspath(__file__))
 OmegaConf.clear_resolvers()
 OmegaConf.register_resolver('full_path', lambda sub_path: os.path.join(tests_path, sub_path))
 config = OmegaConf.merge(OmegaConf.load(os.path.join(tests_path, '..', 'bigpipe_response', 'conf', 'bigpipe.yaml')), OmegaConf.load(os.path.join(tests_path, 'data', 'bigpipe_settings.yaml')))
+
 Bigpipe.init(config.bigpipe)
+print("Installing javascript dependencies.")
+Bigpipe.get().start()
+
 TestUtils.empty_output_folder(Bigpipe.get().config.rendered_output_path)
 
 

@@ -7,18 +7,24 @@ from omegaconf import OmegaConf
 from bigpipe_response import utils
 from bigpipe_response.bigpipe_render_options import BigpipeRenderOptions
 from bigpipe_response.conf.bigpipe_settings import BigpipeSettings
-from bigpipe_response.processors_manager import ProcessorsManager
+from bigpipe_response.remote.node_installer import NodeInstaller
+from bigpipe_response.remote.remote_client_server import RemoteClientServer
+
+from django.views.i18n import JavaScriptCatalog, get_formats
 
 
 class Bigpipe(object):
 
     __instance = None
 
-    def __init__(self, config: OmegaConf, processors: list = []):
+    def __init__(self, config: OmegaConf):
         BigpipeSettings.validate_settings(config)
 
         self.conf = config
         self.logger = logging.getLogger(self.__class__.__name__)
+        self.output_dir = os.path.normpath(os.path.join(self.conf.rendered_output_path, self.conf.rendered_output_container))
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
 
         # set render default options
         self.default_render_option = BigpipeRenderOptions(
@@ -31,8 +37,13 @@ class Bigpipe(object):
             javascript_dom_bind=utils.get_class(self.conf.processors.js.javascript_dom_bind)(),
         )
 
-        # processors manager
-        self.processors_manager = ProcessorsManager(self.conf, processors)
+    def start(self):
+        #
+        # install js dependencies
+        self.logger.info("Installing javascript dependencies.")
+        javascript_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "js")
+        self.__install_javascript_dependencies(javascript_folder)
+
 
         # install js dependencies
         javascript_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "js")
@@ -40,11 +51,26 @@ class Bigpipe(object):
             os.path.join(javascript_folder, "browser", "bigpipe.js"),
             os.path.join(self.conf.rendered_output_path, "bigpipe.js"),
         )
+        self.remote_client_server = RemoteClientServer(javascript_folder,
+                                                       self.conf.is_production_mode,
+                                                       self.conf.remote.port_start,
+                                                       self.conf.remote.port_count,
+                                                       OmegaConf.to_container(self.conf.remote.extra_node_packages, resolve=True))
+
+
+        # processors manager
+        from bigpipe_response.processors_manager import ProcessorsManager
+
+        self.processors_manager = ProcessorsManager(self.conf)
+
+        # start remote js server
+        self.logger.info("Starting remote javascript server.")
+        self.remote_client_server.start()
 
     @staticmethod
-    def init(config: OmegaConf, processors: list = []):
+    def init(config: OmegaConf):
         if Bigpipe.__instance is None:
-            Bigpipe.__instance = Bigpipe(config, processors=processors)
+            Bigpipe.__instance = Bigpipe(config)
 
     @staticmethod
     def get():
@@ -54,6 +80,7 @@ class Bigpipe(object):
 
     def shutdown(self):
         self.processors_manager.shutdown()
+        self.remote_client_server.shutdown()
 
     @property
     def processors(self):
@@ -62,6 +89,13 @@ class Bigpipe(object):
     @property
     def config(self):
         return self.conf
+
+    @property
+    def remote(self):
+        return self.remote_client_server
+
+    def processor_dir(self, processor_name: str):
+        return os.path.join(self.output_dir, processor_name)
 
     def get_render_option(self, render_option: BigpipeRenderOptions):
         if render_option:
@@ -73,3 +107,16 @@ class Bigpipe(object):
             return render_option
         return self.default_render_option
 
+    def __install_javascript_dependencies(self, javascript_folder):
+        jsi18n_file = os.path.join(javascript_folder, "dependencies", "jsi18n.js")
+        if not os.path.isfile(jsi18n_file):
+            with open(jsi18n_file, "wb") as jsi18n_file:
+                file_content = (
+                    JavaScriptCatalog()
+                    .render_to_response({"catalog": {}, "formats": get_formats(), "plural": {}})
+                    .content
+                )
+                jsi18n_file.write(file_content)
+                jsi18n_file.close()
+
+        NodeInstaller.init(javascript_folder)
