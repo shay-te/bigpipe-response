@@ -1,7 +1,12 @@
 import logging
 import os
+from shutil import copyfile
 
-from bigpipe_response.bigpipe import Bigpipe
+from bigpipe_response.remote.remote_client_server import RemoteClientServer
+from django.views.i18n import JavaScriptCatalog
+
+from bigpipe_response.remote.node_installer import NodeInstaller
+
 from omegaconf import OmegaConf
 
 from bigpipe_response.conf.bigpipe_settings import BigpipeSettings
@@ -9,14 +14,16 @@ from bigpipe_response.processors.base_file_processor import BaseFileProcessor
 from bigpipe_response.processors.base_processor import BaseProcessor
 from bigpipe_response.processors.i18n_processor import I18nProcessor
 from bigpipe_response.processors.remote_js_file_processor import RemoteJsFileProcessor
+from django.views.i18n import JavaScriptCatalog, get_formats
 
 
 class ProcessorsManager(object):
     def __init__(self, conf, processors: list = []):
         self.conf = conf
         self.logger = logging.getLogger(self.__class__.__name__)
-
+        #
         # set output directory
+        #
         self.output_dir = os.path.normpath(os.path.join(self.conf.rendered_output_path, self.conf.rendered_output_container))
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
@@ -26,7 +33,24 @@ class ProcessorsManager(object):
             os.makedirs(self.virtual_source_dir)
 
 
+        #
+        # Install js dependencies
+        #
+        self.logger.info("Installing javascript dependencies.")
+        javascript_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "js")
+        self.__install_javascript_dependencies(javascript_folder)
+        copyfile(
+            os.path.join(javascript_folder, "browser", "bigpipe.js"),
+            os.path.join(self.conf.rendered_output_path, "bigpipe.js"),
+        )
+        self.remote_client_server = RemoteClientServer(javascript_folder,
+                                                       self.conf.is_production_mode,
+                                                       self.conf.remote.port_start,
+                                                       self.conf.remote.port_count,
+                                                       OmegaConf.to_container(self.conf.remote.extra_node_packages, resolve=True))
+        #
         # Bundle dependencies
+        #
         self.logger.info("Settings up processors.")
         self.__processors = {
             **self.__generate_default_processors(),
@@ -35,15 +59,19 @@ class ProcessorsManager(object):
         for proc_name, processor in self.__processors.items():
             if not isinstance(processor, BaseProcessor):
                 raise ValueError("processor must be a baseclass of 'BaseProcessor'. Got: {} ".format(processor.__class__.__name__))
-            self.make_processor_dir(proc_name)
+            processor._start(self.remote_client_server, self.conf.is_production_mode, self.get_processor_output_dir(proc_name))
 
+        #
+        # start remote js server
+        #
+        self.logger.info("Starting remote javascript server.")
+        self.remote_client_server.start()
 
     def filter_unregistered_dependencies(self, proc_name: str, dependencies: list):
         if not proc_name in self.__processors:
             raise ValueError("processor by name [{}] dose not exists.".format(proc_name))
         if not isinstance(self.__processors[proc_name], BaseFileProcessor):
-            raise ValueError("processor by name [{}] must be of type BaseFileProcessor.".format(proc_name)
-            )
+            raise ValueError("processor by name [{}] must be of type BaseFileProcessor.".format(proc_name))
         proc = self.__processors[proc_name]
         return [dependency for dependency in dependencies if proc.is_component_registered(dependency)]
 
@@ -66,15 +94,13 @@ class ProcessorsManager(object):
             # 2 there is nothing to do in case of source file not exists ant no dependencies to import
             # 3 register the new generated missing source
             # 4 process the source
-
             if not isinstance(processor, BaseFileProcessor):
                 raise ValueError("generate_missing_source option supports only BaseFileProcessor")
 
             if not processor.is_component_registered(input):
                 if not include_dependencies:
                     raise ValueError("generate_missing_source was set and include_dependencies is empty, nothing to do")
-
-                processor.register_component(input, self.__generate_processor_input(proc_name, "{}.{}".format(input, processor.target_ext)),)
+                processor.register_component(input, self.__generate_processor_input(proc_name, "{}.{}".format(input, processor.target_ext)))
 
         return self.__processors[proc_name].run(input, options, include_dependencies, exclude_dependencies)
 
@@ -90,6 +116,7 @@ class ProcessorsManager(object):
                 self.__processors[key]._shutdown()
             except:
                 self.logger.error("Error shutting fown processor by name [{}]".format(key))
+        self.remote_client_server.shutdown()
 
     def __generate_default_processors(self):
         from bigpipe_response.processors.css_processor import CSSProcessor
@@ -138,8 +165,24 @@ class ProcessorsManager(object):
             os.umask(saved_umask)
         return path
 
-    def make_processor_dir(self, processor_name: str):
-        output_directory = os.path.join(self.output_dir, Bigpipe.get().config.rendered_output_path, Bigpipe.get().config.rendered_output_container, processor_name)
-        if not os.path.exists(output_directory):
-            os.makedirs(output_directory)
-        return output_directory
+    def get_processor_output_dir(self, processor_name: str):
+        if processor_name in self.__processors:
+            proc_output_dir = os.path.join(self.output_dir, processor_name)
+            if not os.path.exists(proc_output_dir):
+                os.makedirs(proc_output_dir)
+            return proc_output_dir
+        raise ValueError('cant get output directory processor is not registered by name [{}]'.format(processor_name))
+
+    def __install_javascript_dependencies(self, javascript_folder):
+        jsi18n_file = os.path.join(javascript_folder, "dependencies", "jsi18n.js")
+        if not os.path.isfile(jsi18n_file):
+            with open(jsi18n_file, "wb") as jsi18n_file:
+                file_content = (
+                    JavaScriptCatalog()
+                    .render_to_response({"catalog": {}, "formats": get_formats(), "plural": {}})
+                    .content
+                )
+                jsi18n_file.write(file_content)
+                jsi18n_file.close()
+
+        NodeInstaller.init(javascript_folder)

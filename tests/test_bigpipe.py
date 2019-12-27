@@ -3,7 +3,6 @@ import unittest
 from django.http import HttpResponse
 from django.utils.translation import activate
 from django.utils.translation.trans_real import DjangoTranslation
-from omegaconf import OmegaConf
 
 from bigpipe_response.bigpipe import Bigpipe
 from bigpipe_response.bigpipe_response import BigpipeResponse
@@ -13,21 +12,15 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.data.settings')
 import django
 django.setup()
 
-tests_path = os.path.dirname(os.path.abspath(__file__))
-OmegaConf.clear_resolvers()
-OmegaConf.register_resolver('full_path', lambda sub_path: os.path.join(tests_path, sub_path))
-config = OmegaConf.merge(OmegaConf.load(os.path.join(tests_path, '..', 'bigpipe_response', 'conf', 'bigpipe.yaml')), OmegaConf.load(os.path.join(tests_path, 'data', 'bigpipe_settings.yaml')))
-Bigpipe.init(config.bigpipe)
-print("Installing javascript dependencies.")
-Bigpipe.get().start()
-
+Bigpipe.init(TestUtils.get_test_configuration().bigpipe)
 TestUtils.empty_output_folder(Bigpipe.get().config.rendered_output_path)
+print("Installing javascript dependencies.")
 
 
 class TestBigpipe(unittest.TestCase):
 
     def tearDown(self):
-        print('shutdown Bigpipe')
+        print('Shutdown Bigpipe')
         Bigpipe.get().shutdown()
 
     def test_js_manager(self):
@@ -43,12 +36,6 @@ class TestBigpipe(unittest.TestCase):
         response_len = len(response_content)
         self.assertEqual(response_len,4)
         self.assertGreater(response_content[response_len-1].decode('utf-8').index('</html>'), 1)
-
-    def test_js_not_exists_component(self):
-        # test will pass only when production mode is on, otherwise bigpipe will render an error message
-        response = BigpipeResponse(HttpResponse(), render_type=BigpipeResponse.RenderType.JAVASCRIPT, render_source='TestMainPageNotExists')
-        with self.assertRaises(ValueError):
-            list(response.streaming_content)
 
     def test_js_render(self):
         prop_data_string_en = '--i-am-props-data-string---'
@@ -80,4 +67,8 @@ class TestBigpipe(unittest.TestCase):
         self.assertGreater(response_str_he.index(prop_data_string_he), 10)
         self.assertGreater(response_str_he.index(i18n_string_he), 10)
 
-
+    def test_js_not_exists_component(self):
+        # test will pass only when production mode is on, otherwise bigpipe will render an error message
+        response = BigpipeResponse(HttpResponse(), render_type=BigpipeResponse.RenderType.JAVASCRIPT, render_source='TestMainPageNotExists')
+        with self.assertRaises(ValueError):
+            list(response.streaming_content)

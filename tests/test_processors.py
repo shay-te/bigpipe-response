@@ -15,7 +15,6 @@ config = OmegaConf.merge(OmegaConf.load(os.path.join(tests_path, '..', 'bigpipe_
 
 Bigpipe.init(config.bigpipe)
 print("Installing javascript dependencies.")
-Bigpipe.get().start()
 
 TestUtils.empty_output_folder(Bigpipe.get().config.rendered_output_path)
 

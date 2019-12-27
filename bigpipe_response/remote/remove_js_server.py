@@ -13,6 +13,9 @@ from contextlib import suppress
 from subprocess import Popen, PIPE
 from time import sleep
 
+from requests.adapters import HTTPAdapter
+from urllib3 import Retry
+
 
 class RemoteJsServer(object):
 
@@ -28,8 +31,8 @@ class RemoteJsServer(object):
         return True if self.process and self.process.poll() is None else False
 
     def start_server(self, port):
-        if self.process: raise EnvironmentError('RemoteJsServer is already running.')
-
+        if self.process:
+            raise EnvironmentError('RemoteJsServer is already running.')
         self.logger.info('Initializing RemoteJsServer. Attempt to start remove javascript server on port  port {}'.format(port))
         try:
             token = self.__generate_token()
@@ -43,11 +46,11 @@ class RemoteJsServer(object):
             sleep(0.6)  # wait for server to start
             poll = process.poll()
             if poll is None:
-                # threading.Thread(target=self.__output_reader, args=(process.stdout,)).start()
-                # threading.Thread(target=self.__output_reader, args=(process.stderr,)).start()
-
+                # threading.Thread(target=self.__output_reader, args=('STDOUT', process.stdout,)).start()
+                # threading.Thread(target=self.__output_reader, args=('STDERR', process.stderr,)).start()
+                self.process = process
                 self.__validate_server_is_running(port, token)
-                self.__register_server_start(process, token)
+
                 return token
             else:
                 out, err = process.communicate()
@@ -72,21 +75,31 @@ class RemoteJsServer(object):
             self.logger.info("RemoteJsServer.stop_server, trying to kill node process.")
 
     def __validate_server_is_running(self, port, token):
-        response = requests.post('http://localhost:{}/ding'.format(port), headers={'Authorization': 'Basic {}'.format(token)})
+        response = self.requests_retry_session().post('http://localhost:{}/ding'.format(port), headers={'Authorization': 'Basic {}'.format(token)}, timeout=1)
         if response.status_code == 200:
             response_json = json.loads(response.content.decode('utf-8'))
             if response_json['message'].index('dong') == 0:
                 return True
         raise ValueError('Server is not running under port [{}]'.format(port))
 
-    def __register_server_start(self, process, token):
-        self.process = process
-        self.token = token
-
     def __generate_token(self, string_length=6):
         letters_and_digits = string.ascii_letters + string.digits
         return ''.join(random.choice(letters_and_digits) for _ in range(string_length))
 
-    # def __output_reader(self, stream):
+    def requests_retry_session(self, retries= 3, backoff_factor=0.3, status_forcelist=(500, 502, 504), session=None):
+        session = session or requests.Session()
+        retry = Retry(
+            total=retries,
+            read=retries,
+            connect=retries,
+            backoff_factor=backoff_factor,
+            status_forcelist=status_forcelist,
+        )
+        adapter = HTTPAdapter(max_retries=retry)
+        session.mount('http://', adapter)
+        session.mount('https://', adapter)
+        return session
+
+    # def __output_reader(self, name: str, stream):
     #     for line in iter(stream.readline, b''):
-    #         print('got line: {0}'.format(line.decode('utf-8')), end='')
+    #         print('{}: {}'.format(name, line.decode('utf-8')), end='')

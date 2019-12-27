@@ -3,6 +3,7 @@ import os
 import re
 from abc import abstractmethod
 
+from bigpipe_response.remote.remote_client_server import RemoteClientServer
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
@@ -39,13 +40,16 @@ class BaseFileProcessor(BaseProcessor):
         self._component_to_file = {}
         self._output_file_to_effected_files = {}
         self._processed_files = []
+        self.is_production_mode = None
 
-        for code_base_directory in code_base_directories:
+        for code_base_directory in self.code_base_directories:
             self.__scan_folder(code_base_directory)
 
-        if not Bigpipe.get().config.is_production_mode:
+    def on_start(self, remote_client_server: RemoteClientServer, is_production_mode: bool, output_dir: str):
+        self.is_production_mode = is_production_mode
+        if not is_production_mode:
             self.observer = Observer()
-            for code_base_directory in code_base_directories:
+            for code_base_directory in self.code_base_directories:
                 self.observer.schedule(SourceChangesHandler(self), path=code_base_directory, recursive=True)
             self.observer.start()
 
@@ -56,7 +60,7 @@ class BaseFileProcessor(BaseProcessor):
             raise ValueError('Component by source: [{}]. only string that contains letters, numbers, underscores and dashes are allowed'.format(source))
 
         if source not in self._component_to_file:
-            raise ValueError('Component path for input: [{}] is scanned under the [{}] folder. but processed file dose not exists. '.format(source, self.code_base_directories))
+            raise ValueError('Component path for input: [{}] is scanned under the {} folder. but processed file dose not exists. '.format(source, self.code_base_directories))
 
         input_file = self._component_to_file[source]
         if not os.path.isfile(input_file):
@@ -73,7 +77,7 @@ class BaseFileProcessor(BaseProcessor):
         else:
             effected_files = self._output_file_to_effected_files[output_file]
 
-        if not Bigpipe.get().config.is_production_mode:
+        if not self.is_production_mode:
             self._processed_files.append(output_file)
         return ProcessorResult(effected_files, output_file)
 
@@ -126,7 +130,7 @@ class BaseFileProcessor(BaseProcessor):
     def is_component_registered(self, component_name):
         return True if component_name in self._component_to_file else False
 
-    def register_component(self, component_name, path):
+    def register_component(self, component_name: str, path: str):
         self._component_to_file[component_name] = path
 
     @abstractmethod
