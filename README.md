@@ -48,6 +48,9 @@ and using [omegaconf](https://github.com/omry/omegaconf) for configuration
 
     pip install bigpipe-response
 
+### Running tests
+
+    python -m unittest discover
 
 ## Contributing
 
