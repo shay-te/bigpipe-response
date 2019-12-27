@@ -50,7 +50,7 @@ server.post('/register_processor/:processor_name',
             middlewareValidateRequestToken,
             function (req, res, next) {
     bigpipeProcessorManager.registerProcessor(req.params.processor_name, req.files.processor_file.path).then(function() {
-        res.send(renderMessage('module registered [' + req.params.processor_name + '] was registered.'));
+        res.send(renderMessage('module [' + req.params.processor_name + '] was registered.'));
     }).catch(function(error) {
         return handleError(next, error);
     });

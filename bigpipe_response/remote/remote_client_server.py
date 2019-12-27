@@ -36,6 +36,9 @@ class RemoteClientServer(object):
             "create-react-class",
             "react-dom",
             "register-module",
+            # WebpackModuleProcessor
+            "webpack",
+            "virtual-module-webpack-plugin"
         ] + extra_node_packages
         NodeInstaller.get().install_javascript_dependencies(packages)
 

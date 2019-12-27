@@ -6,6 +6,8 @@ from bigpipe_response.bigpipe import Bigpipe
 
 from bigpipe_response.bigpipe_response import BigpipeResponse
 from bigpipe_response.content_loader import ContentLoader
+from bigpipe_response.dependencies_marshalling import DependenciesMarshalling
+
 from tests.test_utils import TestUtils
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.data.settings')
@@ -18,6 +20,7 @@ print("Installing javascript dependencies.")
 
 
 class TestContentLoader(unittest.TestCase):
+
     def tearDown(self):
         print('Shutdown Bigpipe')
         Bigpipe.get().shutdown()
@@ -39,3 +42,11 @@ class TestContentLoader(unittest.TestCase):
             self.assertGreater(css.index('.test-class{color:#ADADAD}'), 1)
             self.assertGreater(len(i18n), 1)
             self.assertNotEqual(i18n['CONST_USER_open_question_placeholder_1'], None)
+
+    def test_multiple_processors(self):
+        content_loader = ContentLoader(render_type=BigpipeResponse.RenderType.JAVASCRIPT,
+                                       render_source='TestMainPage',
+                                       js_dependencies=['simple_js_file', DependenciesMarshalling.marshall('React', processor_name='js_modules', is_link=True)],
+                                       scss_dependencies=['main'],
+                                       i18n_dependencies=["CONST_USER_open_question_placeholder.*"])
+        content, js, css, i18n, js_effected_files, css_effected_files = content_loader.load_content('body', [], [])

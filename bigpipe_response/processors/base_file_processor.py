@@ -38,7 +38,6 @@ class BaseFileProcessor(BaseProcessor):
         self.exclude_dir = exclude_dir
 
         self._component_to_file = {}
-        self._output_file_to_effected_files = {}
         self._processed_files = []
         self.is_production_mode = None
 
@@ -66,20 +65,14 @@ class BaseFileProcessor(BaseProcessor):
         if not os.path.isfile(input_file):
             raise ValueError('Source input file: [{}]. Dose not exists'.format(input_file))
 
-    def run(self, source: str, options: dict = {}, include_dependencies: list = [], exclude_dependencies: list = []):
-        super().run(source, options, include_dependencies, exclude_dependencies)
+    def process_source(self, source: str, options: dict = {}, include_dependencies: list = [], exclude_dependencies: list = []):
         input_file = self._component_to_file[source]
         output_file = self.build_output_file_path(os.path.basename(input_file), include_dependencies, exclude_dependencies)
 
-        if output_file not in self._output_file_to_effected_files or not os.path.isfile(output_file):
-            effected_files = self.process_resource(input_file, output_file, include_dependencies, exclude_dependencies, options)
-            self._output_file_to_effected_files[output_file] = effected_files
-        else:
-            effected_files = self._output_file_to_effected_files[output_file]
-
         if not self.is_production_mode:
             self._processed_files.append(output_file)
-        return ProcessorResult(effected_files, output_file)
+
+        return input_file, output_file
 
     def render(self, source: str, context: dict, i18n: dict):
         super().render(source, context, i18n)

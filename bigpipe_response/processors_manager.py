@@ -3,7 +3,6 @@ import os
 from shutil import copyfile
 
 from bigpipe_response.remote.remote_client_server import RemoteClientServer
-from django.views.i18n import JavaScriptCatalog
 
 from bigpipe_response.remote.node_installer import NodeInstaller
 
@@ -90,16 +89,14 @@ class ProcessorsManager(object):
         processor = self.__processors[proc_name]
         if generate_missing_source:
             # in case of generate missing source
-            # 1 only BaseFileProcessor are supported
+            # 1 case BaseFileProcessor, register the new input
             # 2 there is nothing to do in case of source file not exists ant no dependencies to import
             # 3 register the new generated missing source
             # 4 process the source
-            if not isinstance(processor, BaseFileProcessor):
-                raise ValueError("generate_missing_source option supports only BaseFileProcessor")
+            if not include_dependencies:
+                raise ValueError("generate_missing_source was set and include_dependencies is empty, nothing to do")
 
-            if not processor.is_component_registered(input):
-                if not include_dependencies:
-                    raise ValueError("generate_missing_source was set and include_dependencies is empty, nothing to do")
+            if isinstance(processor, BaseFileProcessor) and not processor.is_component_registered(input):
                 processor.register_component(input, self.__generate_processor_input(proc_name, "{}.{}".format(input, processor.target_ext)))
 
         return self.__processors[proc_name].run(input, options, include_dependencies, exclude_dependencies)
@@ -132,7 +129,7 @@ class ProcessorsManager(object):
 
         module_processor = RemoteJsProcessor(
             self.conf.processors.js_modules.name,
-            self.conf.processors.js.javascript_handler)
+            self.conf.processors.js_modules.javascript_handler)
 
         css_processor = CSSProcessor(
             self.conf.processors.css.name,
