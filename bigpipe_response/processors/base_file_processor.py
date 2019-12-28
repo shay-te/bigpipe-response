@@ -6,11 +6,8 @@ from abc import abstractmethod
 from bigpipe_response.remote.remote_client_server import RemoteClientServer
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
-
-from bigpipe_response.bigpipe import Bigpipe
 from bigpipe_response.decorators import Debounce
 from bigpipe_response.processors.base_processor import BaseProcessor
-from bigpipe_response.processors.processor_result import ProcessorResult
 
 
 class BaseFileProcessor(BaseProcessor):

@@ -38,18 +38,25 @@ class ContentLoader(object):
         self.local_language = translation.get_language()
 
     def load_content(self, target_element: str, ignored_js_dependencies: list, ignored_css_dependencies: list):
-        js_links_proc_to_dep, js_content_proc_to_dep, js_processors_name_order = self.__group_dependencies(DependenciesMarshalling.unmarshall(self.js_dependencies),
-                                                                                                           self.render_options.js_processor_name)
-        css_links_proc_to_dep, css_content_proc_to_dep, css_processors_name_order = self.__group_dependencies(DependenciesMarshalling.unmarshall(self.scss_dependencies),
-                                                                                                              self.render_options.css_processor_name)
+        #
+        # link handing
+        #
+        js_links_proc_to_dep, js_processors_name_order = self.__group_dependencies(True, self.js_dependencies, self.render_options.js_processor_name)
+        css_links_proc_to_dep, css_processors_name_order = self.__group_dependencies(True, self.scss_dependencies, self.render_options.css_processor_name)
 
         # context
         render_context_dict = self.__get_context(self.render_context, js_links_proc_to_dep, css_links_proc_to_dep, js_processors_name_order, css_processors_name_order)
 
+        #
+        # content handing
+        #
         # i18n
         i18n = self.__run_processor_i18n(self.render_source, self.render_options.i18n_processor_name, self.i18n_dependencies)
 
+
+
         # js
+        js_content_proc_to_dep, js_processors_name_order = self.__group_dependencies(False, self.js_dependencies, self.render_options.js_processor_name)
         js, js_effected_files = self.__get_js_content(target_element,
                                                       render_context_dict,
                                                       js_processors_name_order,
@@ -57,36 +64,41 @@ class ContentLoader(object):
                                                       ignored_js_dependencies)
 
         # css
+        css_extra_dependencies = self.__get_css_extra_source(js_content_proc_to_dep, js_effected_files)
+        css_content_proc_to_dep, css_processors_name_order = self.__group_dependencies(False, self.scss_dependencies, self.render_options.css_processor_name, css_extra_dependencies)
 
         css, css_effected_files = self.__get_css_content(css_processors_name_order,
                                                          css_content_proc_to_dep,
-                                                         self.__get_css_extra_source(js_content_proc_to_dep, js_effected_files),
                                                          ignored_css_dependencies)
 
         content = self.__get_content(render_context_dict, i18n)
 
         return content, js, css, i18n, js_effected_files, css_effected_files
 
-    def __group_dependencies(self, dependencies: list, default_processor: str):
-        links = {}
+    def __group_dependencies(self, links_only: bool, dependencies: list, default_processor: str, extra_dependencies_list: list = []):
         content = {}
         processors_order = []
-        for dep in dependencies:
+        for dep in DependenciesMarshalling.unmarshall(dependencies):
             proc_name = dep['processor_name'] if dep['processor_name'] else default_processor
-            # add orders
-            if proc_name not in processors_order:
-                processors_order.append(proc_name)
-
-            if dep['link']:
-                links.setdefault(proc_name, []).append(dep['source'])
-            else:
+            if dep['link'] is True and links_only or not dep['link'] and not links_only:
+                if proc_name not in processors_order: # Keep add order
+                    processors_order.append(proc_name)
                 content.setdefault(proc_name, []).append(dep['source'])
 
-        return links, content, list(processors_order)
+        if extra_dependencies_list:
+            extra_dependencies = self.__filter_unregistered_dependencies(default_processor, extra_dependencies_list)
+            if extra_dependencies:
+                current_dependencies = []
+                if default_processor in processors_order:
+                    current_dependencies = content[default_processor]
+                else:
+                    processors_order.append(default_processor)
+                content[default_processor] = list(set(current_dependencies + extra_dependencies))  # remove duplicates
 
-    def __get_js_content(self, target_element: str, context: dict, processors_name_order: list, processor_name_to_sources: dict, exclude_dependencies: list):
+        return content, list(processors_order)
+
+    def __get_processor_dependencies(self, processors_name_order: list, processor_name_to_sources: dict, exclude_dependencies: list):
         content, effected_files = [], []
-
         for processor_name in processors_name_order:
             if processor_name in processor_name_to_sources:
                 dependencies = processor_name_to_sources[processor_name]
@@ -97,6 +109,10 @@ class ContentLoader(object):
                                                         generate_missing_source=True)
                 content.append(self.__get_file_content(processor_result.output_file))
                 effected_files = effected_files + processor_result.effected_files
+        return content, effected_files
+
+    def __get_js_content(self, target_element: str, context: dict, processors_name_order: list, processor_name_to_sources: dict, exclude_dependencies: list):
+        content, effected_files = self.__get_processor_dependencies(processors_name_order, processor_name_to_sources, exclude_dependencies)
 
         if self.render_type == BigpipeResponse.RenderType.JAVASCRIPT:
             processor_result = self.__run_processor(self.render_source_processor_name,
@@ -109,30 +125,16 @@ class ContentLoader(object):
 
         return ''.join(content), effected_files
 
-    def __get_css_content(self, processors_name_order: list, processor_name_to_sources: dict, css_extra_files: list, exclude_dependencies: list):
-        is_first_processor = True
-        content, effected_files = [], []
-        for processor_name in processors_name_order:
-            if processor_name in processor_name_to_sources:
-                dependencies = processor_name_to_sources[processor_name]
-                if is_first_processor:
-                    css_extra_files = self.__filter_unregistered_dependencies(processor_name, css_extra_files)
-                    dependencies = list(set(dependencies + css_extra_files))  # remove duplicates
-                    is_first_processor = False
+    def __get_css_content(self, processors_name_order: list, processor_name_to_sources: dict, exclude_dependencies: list):
+        content, effected_files = self.__get_processor_dependencies(processors_name_order, processor_name_to_sources, [])
 
-                css_dependencies_result = self.__run_processor(processor_name,
-                                                               self.render_source,
-                                                               include_dependencies=dependencies,
-                                                               exclude_dependencies=[],  # exclude_dependencies,
-                                                               generate_missing_source=True)
-
-                # NOTICE! NOT YET SUPPORTED.
-                # effected files will be only 'include_dependencies' and NOT 'css_dependencies_result.effected_files'.:
-                # effected_files = + css_dependencies_result.effected_files
-                # since included files my have scss variables
-                content.append(self.__get_file_content(css_dependencies_result.output_file))
-
-        return ''.join(content), effected_files
+        # NOTICE! NOT YET SUPPORTED.
+        # effected files will be only 'include_dependencies' and NOT 'css_dependencies_result.effected_files'.
+        # since included files my have scss variables
+        effected_files_css = []
+        for proc_name, dependencies in processor_name_to_sources.items():
+            effected_files_css = effected_files_css + dependencies
+        return ''.join(content), effected_files_css
 
     # __get_css_extra_source will get javascript loaded components and give them for the css processor to include
     def __get_css_extra_source(self, processor_name_to_sources: dict, js_effected_files: list):
@@ -214,9 +216,7 @@ class ContentLoader(object):
     def __get_context(self, context, js_links_processor_name_to_sources: list, css_links_processor_name_to_sources: list, js_processors_ordered, css_processors_ordered):
         links = {}
         if js_links_processor_name_to_sources:
-            js_links = self.__get_dependencies_links(js_processors_ordered, js_links_processor_name_to_sources, self.render_options.js_bundle_link_dependencies)
-
-            links['js_links'] = js_links
+            links['js_links'] = self.__get_dependencies_links(js_processors_ordered, js_links_processor_name_to_sources, self.render_options.js_bundle_link_dependencies)
         if css_links_processor_name_to_sources:
             links['css_links'] = self.__get_dependencies_links(css_processors_ordered, css_links_processor_name_to_sources, self.render_options.css_bundle_link_dependencies)
 

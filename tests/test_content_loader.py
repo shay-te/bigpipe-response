@@ -46,7 +46,22 @@ class TestContentLoader(unittest.TestCase):
     def test_multiple_processors(self):
         content_loader = ContentLoader(render_type=BigpipeResponse.RenderType.JAVASCRIPT,
                                        render_source='TestMainPage',
-                                       js_dependencies=['simple_js_file', DependenciesMarshalling.marshall('React', processor_name='js_modules', is_link=True)],
+                                       js_dependencies=['simple_js_file', DependenciesMarshalling.marshall('React', processor_name='js_modules', is_link=False)],
                                        scss_dependencies=['main'],
                                        i18n_dependencies=["CONST_USER_open_question_placeholder.*"])
         content, js, css, i18n, js_effected_files, css_effected_files = content_loader.load_content('body', [], [])
+        self.assertNotEqual(content, None)
+        self.assertNotEqual(js, None)
+        self.assertNotEqual(css, None)
+        self.assertNotEqual(i18n, None)
+        self.assertGreater(js.index("Copyright (c) Facebook, Inc. and its affiliates"), 1)
+
+
+    def test_css_included_by_javascript(self):
+        content_loader = ContentLoader(render_type=BigpipeResponse.RenderType.JAVASCRIPT, render_source='TestMainPage')
+        content, js, css, i18n, js_effected_files, css_effected_files = content_loader.load_content('body', [], [])
+        self.assertNotEqual(content, None)
+        self.assertNotEqual(js, None)
+        self.assertNotEqual(css, None)
+        self.assertNotEqual(i18n, None)
+        self.assertGreater(css.index('.test-second-page'), 1)

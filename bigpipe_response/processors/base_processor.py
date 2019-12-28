@@ -67,7 +67,7 @@ class BaseProcessor(object):
         self.on_shutdown()
 
     def build_output_file_path(self, input_file_name: str, include_dependencies: list = [], exclude_dependencies: list = []):
-        return os.path.join(self.output_dir, '{}_{}.{}-{}.{}'.format(input_file_name, self.processor_name, self.__dependencies_to_hash(include_dependencies), self.__dependencies_to_hash(exclude_dependencies), self.target_ext))
+        return os.path.join(self.output_dir, '{}.__.{}.__.{}-{}.{}'.format(input_file_name, self.processor_name, self.__dependencies_to_hash(include_dependencies), self.__dependencies_to_hash(exclude_dependencies), self.target_ext))
 
     def __dependencies_to_hash(self, dependencies_list: list):
         # return hashlib.blake2b(str(dependencies_list).encode(), digest_size=5).hexdigest() if dependencies_list else '_' NOT YET SUPPORTED

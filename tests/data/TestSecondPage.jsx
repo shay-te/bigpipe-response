@@ -1,7 +1,7 @@
 var TestSecondPage = createReactClass({
 	render: function () {
 		return (
-			<div>
+			<div className='test-second-page'>
                 'i am the second page'
 			</div>
 		);

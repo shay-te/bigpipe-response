@@ -72,3 +72,4 @@ class TestBigpipe(unittest.TestCase):
         response = BigpipeResponse(HttpResponse(), render_type=BigpipeResponse.RenderType.JAVASCRIPT, render_source='TestMainPageNotExists')
         with self.assertRaises(ValueError):
             list(response.streaming_content)
+
