@@ -14,14 +14,21 @@ class WebpackModuleProcessor extends BaseProcessor {
     processResource(input, output, includeDependencies, excludeDependencies) {
         var requireString = '';
         for(var i in includeDependencies) {
-            requireString += 'require("' + includeDependencies[i] + '"); \n'
+            let includeDependency = includeDependencies[i].trim();
+            if(includeDependency.indexOf('=') > 0) {
+                let includeSplit = includeDependency.split('=')
+                requireString += 'window.'+ includeSplit[0] + ' = require("' + includeSplit[1] + '");'
+            } else {
+                requireString += 'require("' + includeDependency + '");'
+            }
         }
-
+        console.log('WebpackModuleProcessor, webpack source: ' + requireString);
         var outputMode = 'development';
         if(this.isProductionMode) { outputMode = 'production' }
 
         const config = {
             mode: outputMode,
+            target: "web",
             entry: { app: "./temp_index.js" },
             output: {
                 filename: path.basename(input) + '.js',
@@ -33,29 +40,42 @@ class WebpackModuleProcessor extends BaseProcessor {
                     contents: requireString,
                 }),
             ],
+            module: {
+                rules: [
+                    {
+                        test: /\.script\.js$/,
+                        use: [
+                            {
+                                loader: 'script-loader',
+                                options: {
+                                    useStrict: false,
+                                },
+                            },
+                        ]
+                    }
+                ]
+            }
         };
         const compiler = webpack(config);
-        var res, rej;
         var result = new Promise(function(resolve, reject) {
-            res = resolve;
-            rej = reject;
-        });
+            compiler.run(function(err, stats) {
+                if(err) {
+                    return reject(err);
+                }
+                var json_stats = stats.toJson();
 
-        compiler.run(function(err, stats) {
-            if(err) {
-                return rej(err);
-            }
-            var json_stats = stats.toJson();
+                if(json_stats.hasOwnProperty('errors') && json_stats.errors.length > 0) {
+                    return reject(json_stats.errors);
+                }
 
-            var effected_file = [];
-            for(var i = 1 ; i < json_stats.modules.length ; i++) {
-                effected_file.push(json_stats.modules[i].identifier);
-            }
-
-            const inputFile = path.join(json_stats.outputPath, json_stats.assetsByChunkName.app);
-            fs.copyFileSync(inputFile, output);
-
-            res(effected_file);
+                var effected_file = [];
+                for(var i = 1 ; i < json_stats.modules.length ; i++) {
+                    effected_file.push(json_stats.modules[i].identifier);
+                }
+                const inputFile = path.join(json_stats.outputPath, json_stats.assetsByChunkName.app);
+                fs.copyFileSync(inputFile, output);
+                resolve(effected_file);
+            });
         });
 
         return result;

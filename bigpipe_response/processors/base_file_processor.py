@@ -42,7 +42,6 @@ class BaseFileProcessor(BaseProcessor):
             self.__scan_folder(code_base_directory)
 
     def on_start(self, remote_client_server: RemoteClientServer, is_production_mode: bool, output_dir: str):
-        self.is_production_mode = is_production_mode
         if not is_production_mode:
             self.observer = Observer()
             for code_base_directory in self.code_base_directories:

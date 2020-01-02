@@ -1,3 +1,8 @@
+import logging
+
+logger = logging.getLogger('utils')
+
+
 def get_class(path):
     try:
         from importlib import import_module
@@ -7,10 +12,8 @@ def get_class(path):
         try:
             klass = getattr(mod, class_name)
         except AttributeError:
-            raise ImportError(
-                "Class {} is not in module {}".format(class_name, module_path)
-            )
+            raise ImportError("Class {} is not in module {}".format(class_name, module_path))
         return klass
     except ValueError as e:
-        log.error("Error initializing class " + path)
+        logger.error("Error initializing class " + path)
         raise e

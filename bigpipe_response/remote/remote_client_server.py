@@ -128,12 +128,9 @@ class RemoteClientServer(object):
             else:
                 break
 
-        self.logger.error(
-            "Unable to find available port in range ({} - {})".format(
-                self.port_start, self.port_end
-            )
-        )
-        raise ValueError("Unable to find available port to start the server")
+        err_msg = "Unable to find available port in range ({} - {})".format(self.port_start, self.port_end)
+        self.logger.error(err_msg)
+        raise ValueError(err_msg)
 
     def __scan_for_available_port(self, from_port, to_port):
         for port in range(from_port, to_port):

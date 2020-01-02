@@ -1,5 +1,4 @@
 import TestSecondPage from './TestSecondPage.jsx';
-import simple_js_file from './simple_js_file.js';
 
 var TestMainPage = createReactClass({
     getDefaultProps: function() {

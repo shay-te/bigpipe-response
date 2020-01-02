@@ -54,12 +54,14 @@ class BaseProcessor(object):
         self.validate_input(source)
 
     def on_start(self, remote_client_server: RemoteClientServer, is_production_mode: bool, output_dir: str):
-        self.is_production_mode = is_production_mode
+        pass
 
     def on_shutdown(self):
         pass
 
     def _start(self, remote_client_server, is_production_mode, output_dir):
+        self.remote_client_server = remote_client_server
+        self.is_production_mode = is_production_mode
         self.output_dir = output_dir
         self.on_start(remote_client_server, is_production_mode, output_dir)
 

@@ -22,7 +22,7 @@ class ContentLoader(object):
             raise ValueError('render context must be a dict')
         if render_options is not None and not isinstance(render_options, BigpipeRenderOptions):
             raise ValueError('render_options can be None or instance of BigpipeRenderOptions')
-        render_source_unmarshalled = DependenciesMarshalling.unmarshall(render_source)
+        render_source_unmarshalled = DependenciesMarshalling.unmarshall(render_source)[0]
         if render_source_unmarshalled['link']:
             raise ValueError('render_source cannot be link')
 
@@ -189,7 +189,7 @@ class ContentLoader(object):
             output_directory_length = len(Bigpipe.get().config.rendered_output_path)
             output_file = output_file[output_directory_length::].replace('\\', '/')
             links.append('{}/{}'.format(static_uri, output_file.strip('/')))
-        return links, output_files
+        return links
 
     #
     #  Bigpipe call processors

@@ -7,6 +7,7 @@ from bigpipe_response.bigpipe import Bigpipe
 from bigpipe_response.bigpipe_response import BigpipeResponse
 from bigpipe_response.content_loader import ContentLoader
 from bigpipe_response.dependencies_marshalling import DependenciesMarshalling
+from bigpipe_response.helpers import to_include
 
 from tests.test_utils import TestUtils
 
@@ -44,9 +45,10 @@ class TestContentLoader(unittest.TestCase):
             self.assertNotEqual(i18n['CONST_USER_open_question_placeholder_1'], None)
 
     def test_multiple_processors(self):
+        module_processor_name = Bigpipe.get().config.processors.js_modules.name
         content_loader = ContentLoader(render_type=BigpipeResponse.RenderType.JAVASCRIPT,
                                        render_source='TestMainPage',
-                                       js_dependencies=['simple_js_file', DependenciesMarshalling.marshall('React', processor_name='js_modules', is_link=False)],
+                                       js_dependencies=['simple_js_file'] + to_include(['React=react', 'ReactDOM=react-dom', 'createReactClass=create-react-class'], is_link=False, processor_name=module_processor_name),
                                        scss_dependencies=['main'],
                                        i18n_dependencies=["CONST_USER_open_question_placeholder.*"])
         content, js, css, i18n, js_effected_files, css_effected_files = content_loader.load_content('body', [], [])
@@ -55,7 +57,8 @@ class TestContentLoader(unittest.TestCase):
         self.assertNotEqual(css, None)
         self.assertNotEqual(i18n, None)
         self.assertGreater(js.index("Copyright (c) Facebook, Inc. and its affiliates"), 1)
-
+        self.assertGreater(js.index("react.production.min.js"), 1)
+        self.assertGreater(js.index("react-dom.production.min.js"), 1)
 
     def test_css_included_by_javascript(self):
         content_loader = ContentLoader(render_type=BigpipeResponse.RenderType.JAVASCRIPT, render_source='TestMainPage')

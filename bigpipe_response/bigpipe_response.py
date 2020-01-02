@@ -35,21 +35,14 @@ class BigpipeResponse(StreamingHttpResponse):
 
         self.logger = logging.getLogger(self.__class__.__name__)
         self.request = request
-        self.render_source = render_source
         self.pagelets = pagelets
         self.processed_js_files, self.processed_css_files = [], []
 
-        self.render_source = render_source
-        self.render_type = render_type
-        self.render_options = render_options
-        self.render_context = render_context
-        self.js_dependencies = js_dependencies
-        self.scss_dependencies = scss_dependencies
-        self.i18n_dependencies = i18n_dependencies
+        from bigpipe_response.content_loader import ContentLoader
+        self.content_loader = ContentLoader(render_type, render_source, render_context, render_options, js_dependencies, scss_dependencies, i18n_dependencies)
+
 
     def __stream_content(self):
-        from bigpipe_response.content_loader import ContentLoader
-        self.content_loader = ContentLoader(self.render_type, self.render_source, self.render_context, self.render_options, self.js_dependencies, self.scss_dependencies, self.i18n_dependencies)
         last_pagelet_target = None
         try:
             content, js, css, i18n, js_effected_files, css_effected_files = self.content_loader.load_content('body', [], [])
@@ -74,7 +67,7 @@ class BigpipeResponse(StreamingHttpResponse):
             self.logger.error("Error handling bigpipe response", exc_info=sys.exc_info())
 
             if not Bigpipe.get().config.is_production_mode: # DEVELOPMENT MODE
-                error_target = 'Error in request source [{}]{}'.format(self.render_source, ', on pagelet target element [{}]'.format(last_pagelet_target) if last_pagelet_target else '')
+                error_target = 'Error in request source [{}]{}'.format(self.content_loader.render_source, ', on pagelet target element [{}]'.format(last_pagelet_target) if last_pagelet_target else '')
                 content, js, css = BigpipeDebugger.get_exception_content(error_target, (str(ex.errors) if hasattr(ex, 'errors') else str(ex)), traceback.format_exc())
                 i18n = {}
                 if last_pagelet_target:

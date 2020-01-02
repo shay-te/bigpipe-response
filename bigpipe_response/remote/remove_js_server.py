@@ -38,16 +38,16 @@ class RemoteJsServer(object):
             token = self.__generate_token()
 
             process = Popen(['node', 'index.js', '--port={}'.format(port), '--token={}'.format(token), '--mode={}'.format('PRODUCTION' if self.is_production else 'DEVELOPMENT')],
-                            # stdout=PIPE,
-                            # stderr=PIPE,
+                            stdout=PIPE,  # Remark we not thread listening
+                            stderr=PIPE,  # Remark we not thread listening
                             cwd=self.working_directory,
                             shell=False)
 
             sleep(0.6)  # wait for server to start
             poll = process.poll()
             if poll is None:
-                # threading.Thread(target=self.__output_reader, args=('STDOUT', process.stdout,)).start()
-                # threading.Thread(target=self.__output_reader, args=('STDERR', process.stderr,)).start()
+                threading.Thread(target=self.__output_reader, args=('STDOUT', process.stdout,)).start()
+                threading.Thread(target=self.__output_reader, args=('STDERR', process.stderr,)).start()
                 self.process = process
                 self.__validate_server_is_running(port, token)
 
@@ -100,6 +100,6 @@ class RemoteJsServer(object):
         session.mount('https://', adapter)
         return session
 
-    # def __output_reader(self, name: str, stream):
-    #     for line in iter(stream.readline, b''):
-    #         print('{}: {}'.format(name, line.decode('utf-8')), end='')
+    def __output_reader(self, name: str, stream):
+        for line in iter(stream.readline, b''):
+            self.logger.debug('{}: {}'.format(name, line.decode('utf-8')))

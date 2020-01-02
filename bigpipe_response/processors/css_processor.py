@@ -12,9 +12,6 @@ class CSSProcessor(BaseFileProcessor):
         self.include_paths = self.__generate_include_paths()
         self.is_production_mode = None
 
-    def on_start(self, remote_client_server: RemoteClientServer, is_production_mode: bool, output_dir: str):
-        self.is_production_mode = is_production_mode
-
     def process_resource(self, input_file: str, output_file: str, include_dependencies: list, exclude_dependencies: list, options: dict = {}):
         effected_files = []
 

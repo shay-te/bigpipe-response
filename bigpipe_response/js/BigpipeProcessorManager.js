@@ -27,6 +27,7 @@ class BigpipeProcessorManager {
     }
 
     registerProcessor(processor_name, processor_file) {
+        console.log('BigpipeProcessorManager.registerProcessor(' + processor_name + ', ...)');
         return new Promise(function(resolve, reject) {
             try {
                 this._validateProcessorName(processor_name);
@@ -41,8 +42,7 @@ class BigpipeProcessorManager {
                         throw new ReferenceError('process_file must be a type of "BaseProcessor".');
                     }
                 }.bind(this)).catch(function(error) {
-                    console.error(error);
-                    throw error;
+                    reject(error)
                 });
             } catch(error) {
                 reject(error)
@@ -51,6 +51,7 @@ class BigpipeProcessorManager {
     }
 
     processFile(processor_name, inputFile, outputFile, includeDependencies, excludeDependencies) {
+        console.log('BigpipeProcessorManager.processFile(' + processor_name + ', ...)');
         return new Promise(function(resolve, reject) {
             try {
                 this._validateProcessorName(processor_name);
@@ -74,6 +75,7 @@ class BigpipeProcessorManager {
     }
 
     renderFile(processor_name, inputFile, context, i18n) {
+        console.log('BigpipeProcessorManager.renderFile(' + processor_name + ', ...)');
         return new Promise(function(resolve, reject) {
             try {
                 this._validateProcessorName(processor_name);
