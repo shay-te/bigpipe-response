@@ -1,0 +1,7 @@
+- multi threaded for each pagelt (consult with omry.)
+- pipe pages
+- load excatly what you need
+- load node moudles as libraby automaticly
+- smart js bundling.
+- plugin create any plugin
+- install node anywhere you like

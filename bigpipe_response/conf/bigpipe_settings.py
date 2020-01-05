@@ -1,8 +1,5 @@
 import os
-
 from omegaconf import OmegaConf
-from pkg_resources import resource_exists
-
 from bigpipe_response import utils
 from bigpipe_response.exceptions import InvalidConfiguration
 

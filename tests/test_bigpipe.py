@@ -14,6 +14,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.data.settings')
 import django
 django.setup()
 
+TestUtils.setup_logger()
 Bigpipe.init(TestUtils.get_test_configuration().bigpipe)
 TestUtils.empty_output_folder(Bigpipe.get().config.rendered_output_path)
 print("Installing javascript dependencies.")
@@ -21,6 +22,10 @@ print("Installing javascript dependencies.")
 
 def generate_dummy_request():
     return HttpRequest()
+
+
+TestUtils.setup_logger()
+
 
 class TestBigpipe(unittest.TestCase):
 

@@ -4,6 +4,8 @@ bigpipe:
   is_production_mode: null
   rendered_output_container: component_cache
 
+  java_script_install_folder: null
+
   remote:
     port_start: 7480
     port_count: 10

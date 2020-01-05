@@ -1,0 +1,37 @@
+{
+  "name": "bigpipe_response",
+  "version": "1.0.0",
+  "description": "bigpipe response remote server",
+  "main": "index.js",
+  "bin": {
+    "bigpipe_response": "./index.js"
+  },
+  "dependencies": {
+    "@rollup/plugin-virtual": "^2.0.0",
+    "create-react-class": "^15.6.3",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "register-module": "0.0.2",
+    "restify": "^8.5.1",
+    "rollup": "^1.27.14",
+    "rollup-plugin-jsx": "^1.0.3",
+    "rollup-plugin-uglify": "^6.0.4",
+    "virtual-module-webpack-plugin": "^0.4.1",
+    "webpack": "^4.41.5",
+    "yargs": "^15.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Shay Tessler",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shacoshe/bigpipe-response.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shacoshe/bigpipe-response/issues"
+  },
+  "homepage": "https://github.com/shacoshe/bigpipe-response#readme"
+}

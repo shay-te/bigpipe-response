@@ -1,19 +1,13 @@
 import os
 import unittest
 
-from omegaconf import OmegaConf
-
 from bigpipe_response.bigpipe import Bigpipe
 from tests.test_utils import TestUtils
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.settings')
 
-tests_path = os.path.dirname(os.path.abspath(__file__))
-OmegaConf.clear_resolvers()
-OmegaConf.register_resolver('full_path', lambda sub_path: os.path.join(tests_path, sub_path))
-config = OmegaConf.merge(OmegaConf.load(os.path.join(tests_path, '..', 'bigpipe_response', 'conf', 'bigpipe.yaml')), OmegaConf.load(os.path.join(tests_path, 'data', 'bigpipe_settings.yaml')))
-
-Bigpipe.init(config.bigpipe)
+TestUtils.setup_logger()
+Bigpipe.init(TestUtils.get_test_configuration().bigpipe)
 print("Installing javascript dependencies.")
 
 TestUtils.empty_output_folder(Bigpipe.get().config.rendered_output_path)

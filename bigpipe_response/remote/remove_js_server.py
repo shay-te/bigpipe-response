@@ -37,7 +37,7 @@ class RemoteJsServer(object):
         try:
             token = self.__generate_token()
 
-            process = Popen(['node', 'index.js', '--port={}'.format(port), '--token={}'.format(token), '--mode={}'.format('PRODUCTION' if self.is_production else 'DEVELOPMENT')],
+            process = Popen(['node', 'node_modules/bigpipe_response/index.js', '--port={}'.format(port), '--token={}'.format(token), '--mode={}'.format('PRODUCTION' if self.is_production else 'DEVELOPMENT')],
                             stdout=PIPE,  # Remark we not thread listening
                             stderr=PIPE,  # Remark we not thread listening
                             cwd=self.working_directory,
@@ -86,7 +86,7 @@ class RemoteJsServer(object):
         letters_and_digits = string.ascii_letters + string.digits
         return ''.join(random.choice(letters_and_digits) for _ in range(string_length))
 
-    def requests_retry_session(self, retries= 3, backoff_factor=0.3, status_forcelist=(500, 502, 504), session=None):
+    def requests_retry_session(self, retries=3, backoff_factor=2, status_forcelist=(500, 502, 504), session=None):
         session = session or requests.Session()
         retry = Retry(
             total=retries,

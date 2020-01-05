@@ -6,7 +6,6 @@ from bigpipe_response.bigpipe import Bigpipe
 
 from bigpipe_response.bigpipe_response import BigpipeResponse
 from bigpipe_response.content_loader import ContentLoader
-from bigpipe_response.dependencies_marshalling import DependenciesMarshalling
 from bigpipe_response.helpers import to_include
 
 from tests.test_utils import TestUtils
@@ -15,6 +14,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.data.settings')
 import django
 django.setup()
 
+TestUtils.setup_logger()
 Bigpipe.init(TestUtils.get_test_configuration().bigpipe)
 TestUtils.empty_output_folder(Bigpipe.get().config.rendered_output_path)
 print("Installing javascript dependencies.")

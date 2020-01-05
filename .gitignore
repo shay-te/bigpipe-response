@@ -16,6 +16,7 @@ __pycache__/
 /bigpipe_response/js/package-lock.json
 /bigpipe_response/js/dependencies/jsi18n.js
 /bigpipe_response/js/registered_processors/*
+/bigpipe_response/js/.cache
 
 # TESTS
 /tests/data_output

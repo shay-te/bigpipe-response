@@ -3,7 +3,6 @@ import traceback
 
 import pkg_resources
 
-from bigpipe_response.remote.node_installer import NodeInstaller
 from bigpipe_response.remote.remote_js_client import RemoteJSClient
 from bigpipe_response.remote.remove_js_server import RemoteJsServer
 import socket
@@ -16,7 +15,6 @@ class RemoteClientServer(object):
         is_production: bool,
         port_start: int,
         port_count: int,
-        extra_node_packages: list = [],
     ):
         self.js_folder = js_folder
         self.is_production = is_production
@@ -25,22 +23,6 @@ class RemoteClientServer(object):
         self.port_end = port_start + port_count
         self.logger = logging.getLogger(self.__class__.__name__)
 
-        packages = [
-            "yargs",
-            "restify",
-            "rollup",
-            "rollup-plugin-jsx",
-            "rollup-plugin-uglify",
-            "@rollup/plugin-virtual",
-            "react",
-            "create-react-class",
-            "react-dom",
-            "register-module",
-            # WebpackModuleProcessor
-            "webpack",
-            "virtual-module-webpack-plugin"
-        ] + extra_node_packages
-        NodeInstaller.get().install_javascript_dependencies(packages)
 
     def register_processor_handler(self, processor_name, resource_str):
         if not processor_name:

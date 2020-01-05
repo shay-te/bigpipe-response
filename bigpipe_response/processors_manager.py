@@ -1,10 +1,9 @@
 import logging
 import os
-from shutil import copyfile
 
+from bigpipe_response.javascript_manager import JavascriptManager
+from bigpipe_response.remote.js_processor_client import JSRemoteClient
 from bigpipe_response.remote.remote_client_server import RemoteClientServer
-
-from bigpipe_response.remote.node_installer import NodeInstaller
 
 from omegaconf import OmegaConf
 
@@ -13,10 +12,10 @@ from bigpipe_response.processors.base_file_processor import BaseFileProcessor
 from bigpipe_response.processors.base_processor import BaseProcessor
 from bigpipe_response.processors.i18n_processor import I18nProcessor
 from bigpipe_response.processors.remote_js_file_processor import RemoteJsFileProcessor
-from django.views.i18n import JavaScriptCatalog, get_formats
 
 
 class ProcessorsManager(object):
+
     def __init__(self, conf, processors: list = []):
         self.conf = conf
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -31,34 +30,36 @@ class ProcessorsManager(object):
         if not os.path.exists(self.virtual_source_dir):
             os.makedirs(self.virtual_source_dir)
 
-
         #
         # Install js dependencies
         #
         self.logger.info("Installing javascript dependencies.")
-        javascript_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "js")
-        self.__install_javascript_dependencies(javascript_folder)
-        copyfile(
-            os.path.join(javascript_folder, "browser", "bigpipe.js"),
-            os.path.join(self.conf.rendered_output_path, "bigpipe.js"),
-        )
-        self.remote_client_server = RemoteClientServer(javascript_folder,
+        javascript_manager = JavascriptManager(self.conf)
+
+        #
+        # Remote javascript server initialize.
+        #
+        self.logger.info("Initialize javascript server.")
+
+        self.remote_client_server = RemoteClientServer(javascript_manager.javascript_folder,
                                                        self.conf.is_production_mode,
                                                        self.conf.remote.port_start,
-                                                       self.conf.remote.port_count,
-                                                       OmegaConf.to_container(self.conf.remote.extra_node_packages, resolve=True))
+                                                       self.conf.remote.port_count)
         #
-        # Bundle dependencies
+        # starting processors
         #
         self.logger.info("Settings up processors.")
         self.__processors = {
             **self.__generate_default_processors(),
             **{processor.processor_name: processor for processor in processors},
         }
+
+        js_remote_client = JSRemoteClient(self.remote_client_server)
         for proc_name, processor in self.__processors.items():
             if not isinstance(processor, BaseProcessor):
                 raise ValueError("processor must be a baseclass of 'BaseProcessor'. Got: {} ".format(processor.__class__.__name__))
-            processor._start(self.remote_client_server, self.conf.is_production_mode, self.get_processor_output_dir(proc_name))
+
+            processor._start(js_remote_client, self.conf.is_production_mode, self.get_processor_output_dir(proc_name))
 
         #
         # start remote js server
@@ -170,16 +171,3 @@ class ProcessorsManager(object):
             return proc_output_dir
         raise ValueError('cant get output directory processor is not registered by name [{}]'.format(processor_name))
 
-    def __install_javascript_dependencies(self, javascript_folder):
-        jsi18n_file = os.path.join(javascript_folder, "dependencies", "jsi18n.js")
-        if not os.path.isfile(jsi18n_file):
-            with open(jsi18n_file, "wb") as jsi18n_file:
-                file_content = (
-                    JavaScriptCatalog()
-                    .render_to_response({"catalog": {}, "formats": get_formats(), "plural": {}})
-                    .content
-                )
-                jsi18n_file.write(file_content)
-                jsi18n_file.close()
-
-        NodeInstaller.init(javascript_folder)

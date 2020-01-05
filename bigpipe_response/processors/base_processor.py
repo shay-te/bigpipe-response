@@ -2,8 +2,7 @@ import os
 from abc import abstractmethod
 
 from bigpipe_response.processors.processor_result import ProcessorResult
-
-from bigpipe_response.remote.remote_client_server import RemoteClientServer
+from bigpipe_response.remote.js_processor_client import JSRemoteClient
 
 
 class BaseProcessor(object):
@@ -53,17 +52,17 @@ class BaseProcessor(object):
     def render(self, source: str, context: dict, i18n: dict):
         self.validate_input(source)
 
-    def on_start(self, remote_client_server: RemoteClientServer, is_production_mode: bool, output_dir: str):
+    def on_start(self, js_remote_client: JSRemoteClient, is_production_mode: bool, output_dir: str):
         pass
 
     def on_shutdown(self):
         pass
 
-    def _start(self, remote_client_server, is_production_mode, output_dir):
-        self.remote_client_server = remote_client_server
+    def _start(self, js_remote_client: JSRemoteClient, is_production_mode: bool, output_dir: str):
+        self.js_remote_client = js_remote_client
         self.is_production_mode = is_production_mode
         self.output_dir = output_dir
-        self.on_start(remote_client_server, is_production_mode, output_dir)
+        self.on_start(js_remote_client, is_production_mode, output_dir)
 
     def _shutdown(self):
         self.on_shutdown()

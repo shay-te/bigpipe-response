@@ -1,0 +1,8 @@
+defaults:
+  - bigpipe
+  - bigpipe_override
+
+hydra:
+  verbose=true:
+  run:
+    dir: outputs

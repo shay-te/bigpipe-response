@@ -3,7 +3,7 @@ import os
 import re
 from abc import abstractmethod
 
-from bigpipe_response.remote.remote_client_server import RemoteClientServer
+from bigpipe_response.remote.js_processor_client import JSRemoteClient
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 from bigpipe_response.decorators import Debounce
@@ -41,7 +41,7 @@ class BaseFileProcessor(BaseProcessor):
         for code_base_directory in self.code_base_directories:
             self.__scan_folder(code_base_directory)
 
-    def on_start(self, remote_client_server: RemoteClientServer, is_production_mode: bool, output_dir: str):
+    def on_start(self, js_remote_client: JSRemoteClient, is_production_mode: bool, output_dir: str):
         if not is_production_mode:
             self.observer = Observer()
             for code_base_directory in self.code_base_directories:
@@ -55,11 +55,11 @@ class BaseFileProcessor(BaseProcessor):
             raise ValueError('Component by source: [{}]. only string that contains letters, numbers, underscores and dashes are allowed'.format(source))
 
         if source not in self._component_to_file:
-            raise ValueError('Component path for input: [{}] is scanned under the {} folder. but processed file dose not exists. '.format(source, self.code_base_directories))
+            raise ValueError('render_source: "{}". is not registerd in processor "{}". The folder {} was scanned. but by name "{}" dose not exists. '.format(source, self.processor_name, self.code_base_directories, source))
 
         input_file = self._component_to_file[source]
         if not os.path.isfile(input_file):
-            raise ValueError('Source input file: [{}]. Dose not exists'.format(input_file))
+            raise ValueError('File dose not exist. render_source "{}" is pointing to file "{}".'.format(source, input_file))
 
     def process_source(self, source: str, options: dict = {}, include_dependencies: list = [], exclude_dependencies: list = []):
         input_file = self._component_to_file[source]
@@ -112,9 +112,8 @@ class BaseFileProcessor(BaseProcessor):
                         self.logger.error('ERROR: Bigpipe SourceWatcher. {} already registered, will use first file: {}'.format(file_name, self._component_to_file[file_name]))
 
     # BaseProcessor files.
-    def _shutdown(self):
+    def on_shutdown(self):
         self._clear()
-        super()._shutdown()
 
     def is_component_registered(self, component_name):
         return True if component_name in self._component_to_file else False
