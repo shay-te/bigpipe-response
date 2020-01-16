@@ -73,9 +73,11 @@ Bigpipe.init(config: DictConfig, processors: list = [])
 ```python
 import os
 from omegaconf import OmegaConf
+from bigpipe_response.bigpipe import Bigpipe
+
 project_path = os.path.dirname(__file__)
 OmegaConf.register_resolver('full_path', lambda sub_path: os.path.join(project_path, sub_path))
-config = OmegaConf.load(os.path.join(os.path.dirname(__file__), 'conf', 'bigpipe_response.yaml'))
+config = OmegaConf.load(os.path.join(project_path, 'conf', 'bigpipe_response.yaml'))
 Bigpipe.init(config.bigpipe)
 ```
  
