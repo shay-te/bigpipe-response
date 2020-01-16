@@ -6,7 +6,6 @@ sidebar_label: Style Guide
 
 # Bigpipe Response
 
-
 ## What is bigpipe response
 
 BigpipeResponse is a standard [django](https://www.djangoproject.com/) `StreamingHttpResponse` response object with the extra capabilities for building fast loading application.   
@@ -323,11 +322,5 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-  
-## examples
+This project is licensed under the BSD 3-Clause License - see the [LICENSE.md](LICENSE) file for details
 
-
-
-## how to extend the existing javascript processor, JAVASCRIPT_DOM_BIND
-## how to write a custom processor
