@@ -319,7 +319,6 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 **Shay Tessler**  - [github](https://github.com/shacoshe)
 
-
 ## License
 
 This project is licensed under the BSD 3-Clause License - see the [LICENSE.md](LICENSE) file for details
