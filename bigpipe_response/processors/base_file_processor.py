@@ -2,6 +2,9 @@ import logging
 import os
 import re
 from abc import abstractmethod
+from collections import Iterable
+
+from omegaconf import OmegaConf
 
 from bigpipe_response.remote.js_processor_client import JSRemoteClient
 from watchdog.events import FileSystemEventHandler
@@ -17,15 +20,15 @@ class BaseFileProcessor(BaseProcessor):
         BaseProcessor.__init__(self, processor_name, target_ext)
 
         if not source_ext or not target_ext:
-            raise ValueError('source and target must be set ')
+            raise ValueError('"source_ext" and "target_ext" must be set.')
 
-        if not isinstance(source_ext, list) or not isinstance(target_ext, str):
-            raise ValueError('source extensions should be a list and target extension should be a string')
+        if not isinstance(source_ext, Iterable) or not isinstance(target_ext, str):
+            raise ValueError('"source_ext" should be a list and "target_ext" should be a string')
 
         if not code_base_directories:
             raise ValueError('code_base_directories cannot be None')
 
-        if not isinstance(code_base_directories, list):
+        if not isinstance(code_base_directories, Iterable):
             raise ValueError('code_base_directories need to be a list of paths to scan')
 
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -35,16 +38,22 @@ class BaseFileProcessor(BaseProcessor):
         self.exclude_dir = exclude_dir
 
         self._component_to_file = {}
+        self._component_to_virtual = {}
         self._processed_files = []
         self.is_production_mode = None
 
-        for code_base_directory in self.code_base_directories:
-            self.__scan_folder(code_base_directory)
+        for i in range(len(self.code_base_directories)):  # Omegaconf resolvers will be  will translated this way
+            code_base_directory = self.code_base_directories[i]
+            if os.path.isdir(code_base_directory):
+                self.__scan_folder(code_base_directory)
+            else:
+                raise ValueError('processor "{}". the code_base_directory "{}" dose not exists'.format(self.processor_name, code_base_directory))
 
     def on_start(self, js_remote_client: JSRemoteClient, is_production_mode: bool, output_dir: str):
         if not is_production_mode:
             self.observer = Observer()
-            for code_base_directory in self.code_base_directories:
+            for i in range(len(self.code_base_directories)):  # Omegaconf resolvers will be  will translated this way
+                code_base_directory = self.code_base_directories[i]
                 self.observer.schedule(SourceChangesHandler(self), path=code_base_directory, recursive=True)
             self.observer.start()
 
@@ -118,8 +127,13 @@ class BaseFileProcessor(BaseProcessor):
     def is_component_registered(self, component_name):
         return True if component_name in self._component_to_file else False
 
-    def register_component(self, component_name: str, path: str):
+    def is_component_virtual(self, component_name):
+        return True if component_name in self._component_to_virtual else False
+
+    def register_component(self, component_name: str, path: str, is_virtual: bool = False):
         self._component_to_file[component_name] = path
+        if is_virtual:
+            self._component_to_virtual[component_name] = is_virtual
 
     @abstractmethod
     def process_resource(self, input_file: str, output_file: str, include_dependencies: list, exclude_dependencies: list, options: dict = {}):

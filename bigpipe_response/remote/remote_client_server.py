@@ -23,7 +23,6 @@ class RemoteClientServer(object):
         self.port_end = port_start + port_count
         self.logger = logging.getLogger(self.__class__.__name__)
 
-
     def register_processor_handler(self, processor_name, resource_str):
         if not processor_name:
             raise ValueError("processor cannot be null")

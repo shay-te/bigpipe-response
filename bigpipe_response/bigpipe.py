@@ -1,10 +1,8 @@
 import logging
 import os
-from shutil import copyfile
 
-from omegaconf import OmegaConf
-
-from bigpipe_response import utils
+from hydra.utils import get_class
+from omegaconf import DictConfig, OmegaConf
 from bigpipe_response.bigpipe_render_options import BigpipeRenderOptions
 from bigpipe_response.conf.bigpipe_settings import BigpipeSettings
 
@@ -13,23 +11,28 @@ class Bigpipe(object):
 
     __instance = None
 
-    def __init__(self, config: OmegaConf, processors: list):
-        BigpipeSettings.validate_settings(config)
-
-        self.conf = config
+    def __init__(self, config: DictConfig, processors: list):
         self.logger = logging.getLogger(self.__class__.__name__)
+
+        #
+        # config
+        #
+        default_config = OmegaConf.load(os.path.join(os.path.dirname(__file__), 'conf', 'bigpipe.yaml'))
+        self.conf = OmegaConf.merge(default_config, config)
+        BigpipeSettings.validate_settings(self.conf)
+
 
         #
         # Set render default options
         #
         self.default_render_option = BigpipeRenderOptions(
-            js_processor_name=self.conf.processors.js.name,
-            css_processor_name=self.conf.processors.css.name,
-            i18n_processor_name=self.conf.processors.i18n.name,
-            js_bundle_link_dependencies=self.conf.processors.js.bundle_link_dependencies,
-            css_bundle_link_dependencies=self.conf.processors.css.bundle_link_dependencies,
-            css_complete_dependencies_by_js=self.conf.processors.css.complete_dependencies_by_js,
-            javascript_dom_bind=utils.get_class(self.conf.processors.js.javascript_dom_bind)(),
+            js_processor_name=self.conf.javascript.default_processor,
+            css_processor_name=self.conf.css.default_processor,
+            i18n_processor_name=self.conf.i18n.default_processor,
+            js_bundle_link_dependencies=self.conf.javascript.bundle_link_dependencies,
+            js_dom_bind=get_class(self.conf.javascript.dom_bind)(),
+            css_bundle_link_dependencies=self.conf.css.bundle_link_dependencies,
+            css_complete_dependencies_by_js=self.conf.css.complete_dependencies_by_js,
         )
 
         #
@@ -39,10 +42,8 @@ class Bigpipe(object):
 
         self.processors_manager = ProcessorsManager(self.conf, processors)
 
-
-
     @staticmethod
-    def init(config: OmegaConf, processors: list = []):
+    def init(config: DictConfig, processors: list = []):
         if Bigpipe.__instance is None:
             Bigpipe.__instance = Bigpipe(config, processors)
 

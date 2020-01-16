@@ -15,12 +15,23 @@ class WebpackModuleProcessor extends BaseProcessor {
         var requireString = '';
         for(var i in includeDependencies) {
             let includeDependency = includeDependencies[i].trim();
+            let includeDependencyVariable = undefined;
+            if(includeDependency.indexOf('.') > 0) {
+                let includeDependencyWithVariable = includeDependency.split('.');
+                includeDependency = includeDependencyWithVariable[0];
+                includeDependencyVariable = includeDependencyWithVariable[1];
+            }
             if(includeDependency.indexOf('=') > 0) {
                 let includeSplit = includeDependency.split('=')
-                requireString += 'window.'+ includeSplit[0] + ' = require("' + includeSplit[1] + '");'
+                requireString += 'window.'+ includeSplit[0] + ' = require("' + includeSplit[1] + '")'
             } else {
-                requireString += 'require("' + includeDependency + '");'
+                requireString += 'require("' + includeDependency + '")'
             }
+            if(includeDependencyVariable) {
+                requireString += '.' + includeDependencyVariable;
+            }
+            requireString += ';';
+
         }
         console.log('WebpackModuleProcessor, webpack source: ' + requireString);
         var outputMode = 'development';

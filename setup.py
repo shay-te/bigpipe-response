@@ -16,6 +16,7 @@ setuptools.setup(
    long_description=long_description,
    long_description_content_type="text/markdown",
    url="https://github.com/shacoshe/bigpipe-response",
+   setup_requires=['wheel'],
    author='Shay Tessler',
    author_email='shay.te@gmail.com',
    packages=setuptools.find_packages(),

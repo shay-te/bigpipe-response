@@ -4,12 +4,12 @@ from bigpipe_response.processors.base_processor import BaseProcessor
 
 class RemoteJsProcessor(BaseProcessor):
 
-    def __init__(self, processor_name: str, processor_js_resource: str):
-        BaseProcessor.__init__(self, processor_name, 'js')
-        self.processor_js_resource = processor_js_resource
+    def __init__(self, processor_name: str, javascript_handler: str, target_ext: str):
+        BaseProcessor.__init__(self, processor_name, target_ext)
+        self.javascript_handler = javascript_handler
 
     def on_start(self, js_remote_client: JSRemoteClient, is_production_mode: bool, output_dir: str):
-        self.js_remote_client.register_processor_handler(self.processor_name, self.processor_js_resource)
+        self.js_remote_client.register_processor_handler(self.processor_name, self.javascript_handler)
 
     def process_resource(self, input_file: str, output_file: str, include_dependencies: list, exclude_dependencies: list, options: dict = {}):
         return self.js_remote_client.process_resource(self.processor_name, input_file, output_file, include_dependencies, exclude_dependencies, options)

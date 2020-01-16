@@ -1,14 +1,12 @@
 import os
 import sass
-from bigpipe_response.remote.remote_client_server import RemoteClientServer
-
 from bigpipe_response.processors.base_file_processor import BaseFileProcessor
 
 
 class CSSProcessor(BaseFileProcessor):
 
-    def __init__(self, processor_name: str, code_base_directories: list, source_ext_list: list, target_ext: str):
-        BaseFileProcessor.__init__(self, processor_name, code_base_directories, source_ext_list, target_ext, 'node_modules')
+    def __init__(self, processor_name: str, code_base_directories: list, source_ext: list, target_ext: str):
+        BaseFileProcessor.__init__(self, processor_name, code_base_directories, source_ext, target_ext, 'node_modules')
         self.include_paths = self.__generate_include_paths()
         self.is_production_mode = None
 
@@ -25,7 +23,10 @@ class CSSProcessor(BaseFileProcessor):
         if not self.is_production_mode:  # on development mode files may change
             self.include_paths = self.__generate_include_paths()
 
-        import_full_paths, import_paths = [input_file], []
+        import_full_paths = []
+        if not self.is_component_virtual(os.path.splitext(os.path.basename(input_file))[0]):
+            import_full_paths.append(input_file)
+        import_paths = []
         for dependency in include_dependencies:
             component_file = self._component_to_file[dependency]
             import_full_paths.append(component_file)

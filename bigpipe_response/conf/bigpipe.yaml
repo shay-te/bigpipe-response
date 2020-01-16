@@ -11,34 +11,47 @@ bigpipe:
     port_count: 10
     extra_node_packages: []
 
+  javascript:
+    default_processor: jsx
+    bundle_link_dependencies: true
+    dom_bind: bigpipe_response.javascript_dom_bind.react_dom_bind.ReactDomBind
+  css:
+    default_processor: css
+    bundle_link_dependencies: true
+    complete_dependencies_by_js: true
+  i18n:
+    default_processor: i18n
+
   processors:
-
-    js:
-      name: jsx
-      source_path: null
-      source_ext:
-        - js
-        - jsx
-      target_ext: js
-      javascript_handler: bigpipe_response.processors.RollupReactProcessor.js
-      javascript_dom_bind: bigpipe_response.javascript_dom_bind.react_dom_bind.ReactDomBind
-      bundle_link_dependencies: true
-
+    jsx:
+      class: bigpipe_response.processors.remote_js_file_processor.RemoteJsFileProcessor
+      params:
+        processor_name: jsx
+        javascript_handler: bigpipe_response.processors.RollupReactProcessor.js
+        code_base_directories: null
+        source_ext:
+          - js
+          - jsx
+        target_ext: js
+        exclude_dir: node_modules
 
     js_modules:
-      name: js_modules
-      target_ext: js
-      javascript_handler: bigpipe_response.processors.WebpackModuleProcessor.js
+      class: bigpipe_response.processors.remote_js_processor.RemoteJsProcessor
+      params:
+        processor_name: js_modules
+        javascript_handler: bigpipe_response.processors.WebpackModuleProcessor.js
+        target_ext: js
 
     css:
-      name: css
-      source_path: none
-      source_ext:
-        - scss
-      target_ext: css
-      complete_dependencies_by_js: true
-      bundle_link_dependencies: true
+      class: bigpipe_response.processors.css_processor.CSSProcessor
+      params:
+        processor_name: css
+        code_base_directories: none
+        source_ext:
+          - scss
+        target_ext: css
 
     i18n:
-      name: i18n
-
+      class: bigpipe_response.processors.i18n_processor.I18nProcessor
+      params:
+        processor_name: i18n

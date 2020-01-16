@@ -41,7 +41,6 @@ class BigpipeResponse(StreamingHttpResponse):
         from bigpipe_response.content_loader import ContentLoader
         self.content_loader = ContentLoader(render_type, render_source, render_context, render_options, js_dependencies, scss_dependencies, i18n_dependencies)
 
-
     def __stream_content(self):
         last_pagelet_target = None
         try:

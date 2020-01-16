@@ -45,7 +45,7 @@ class TestContentLoader(unittest.TestCase):
             self.assertNotEqual(i18n['CONST_USER_open_question_placeholder_1'], None)
 
     def test_multiple_processors(self):
-        module_processor_name = Bigpipe.get().config.processors.js_modules.name
+        module_processor_name = Bigpipe.get().config.processors.js_modules.params.processor_name
         content_loader = ContentLoader(render_type=BigpipeResponse.RenderType.JAVASCRIPT,
                                        render_source='TestMainPage',
                                        js_dependencies=['simple_js_file'] + to_include(['React=react', 'ReactDOM=react-dom', 'createReactClass=create-react-class'], is_link=False, processor_name=module_processor_name),

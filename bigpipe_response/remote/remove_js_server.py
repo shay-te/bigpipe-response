@@ -33,7 +33,7 @@ class RemoteJsServer(object):
     def start_server(self, port):
         if self.process:
             raise EnvironmentError('RemoteJsServer is already running.')
-        self.logger.info('Initializing RemoteJsServer. Attempt to start remove javascript server on port  port {}'.format(port))
+        self.logger.info('Initializing RemoteJsServer. Attempt to start remote javascript server on port  port {}'.format(port))
         try:
             token = self.__generate_token()
 
@@ -54,7 +54,7 @@ class RemoteJsServer(object):
                 return token
             else:
                 out, err = process.communicate()
-                raise OSError(err)
+                raise OSError('{}\n{}'.format(out.decode("utf-8"), err.decode("utf-8")))
         except BaseException as e:
             raise OSError('ERROR: remote javascript server failed to start in port [{}]'.format(port)) from e
 
@@ -86,7 +86,7 @@ class RemoteJsServer(object):
         letters_and_digits = string.ascii_letters + string.digits
         return ''.join(random.choice(letters_and_digits) for _ in range(string_length))
 
-    def requests_retry_session(self, retries=3, backoff_factor=2, status_forcelist=(500, 502, 504), session=None):
+    def requests_retry_session(self, retries=3, backoff_factor=5, status_forcelist=(500, 502, 504), session=None):
         session = session or requests.Session()
         retry = Retry(
             total=retries,

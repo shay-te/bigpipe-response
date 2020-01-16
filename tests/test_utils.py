@@ -32,7 +32,7 @@ class TestUtils(object):
     @staticmethod
     def get_test_configuration(config_override: list = []):
         test_path = os.path.dirname(os.path.abspath(__file__))
-        tests_data_path = os.path.join(test_path, 'data')
+        tests_data_path = os.path.join(test_path, 'data', 'config')
         if not OmegaConf.get_resolver('full_path'):
             OmegaConf.register_resolver('full_path', lambda sub_path: os.path.join(test_path, sub_path))
 

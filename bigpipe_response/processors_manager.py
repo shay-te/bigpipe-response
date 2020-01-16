@@ -1,6 +1,8 @@
 import logging
 import os
 
+from hydra.utils import instantiate
+
 from bigpipe_response.javascript_manager import JavascriptManager
 from bigpipe_response.remote.js_processor_client import JSRemoteClient
 from bigpipe_response.remote.remote_client_server import RemoteClientServer
@@ -98,7 +100,7 @@ class ProcessorsManager(object):
                 raise ValueError("generate_missing_source was set and include_dependencies is empty, nothing to do")
 
             if isinstance(processor, BaseFileProcessor) and not processor.is_component_registered(input):
-                processor.register_component(input, self.__generate_processor_input(proc_name, "{}.{}".format(input, processor.target_ext)))
+                processor.register_component(input, self.__generate_processor_input(proc_name, "{}.{}".format(input, processor.target_ext)), True)
 
         return self.__processors[proc_name].run(input, options, include_dependencies, exclude_dependencies)
 
@@ -117,38 +119,13 @@ class ProcessorsManager(object):
         self.remote_client_server.shutdown()
 
     def __generate_default_processors(self):
-        from bigpipe_response.processors.css_processor import CSSProcessor
-        from bigpipe_response.processors.remote_js_processor import RemoteJsProcessor
-        
-        jsx_processor = RemoteJsFileProcessor(
-            self.conf.processors.js.name,
-            self.conf.processors.js.javascript_handler,
-            OmegaConf.to_container(self.conf.processors.js.source_path, resolve=True),
-            list(self.conf.processors.js.source_ext),
-            self.conf.processors.js.target_ext,
-            exclude_dir='node_modules')
-
-        module_processor = RemoteJsProcessor(
-            self.conf.processors.js_modules.name,
-            self.conf.processors.js_modules.javascript_handler)
-
-        css_processor = CSSProcessor(
-            self.conf.processors.css.name,
-            OmegaConf.to_container(self.conf.processors.css.source_path, resolve=True),
-            list(self.conf.processors.css.source_ext),
-            self.conf.processors.css.target_ext)
-
-        i18n_processor = I18nProcessor(self.conf.processors.i18n.name)
-
-        return {
-            # js
-            jsx_processor.processor_name: jsx_processor,
-            module_processor.processor_name: module_processor,
-            # css
-            css_processor.processor_name: css_processor,
-            # i18n
-            i18n_processor.processor_name: i18n_processor,
-        }
+        result = {}
+        for proc_name, processor in self.conf.processors.items():
+            try:
+                result[proc_name] = instantiate(processor)
+            except:
+                raise ValueError('unable to instantiate processor name [{}]'.format(proc_name))
+        return result
 
     def __generate_processor_input(self, proc_name: str, source: str):
         proc_virtual_source_dir = os.path.join(self.virtual_source_dir, proc_name)

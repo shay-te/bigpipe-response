@@ -120,8 +120,8 @@ class ContentLoader(object):
                                                     exclude_dependencies=exclude_dependencies)
             content.append(self.__get_file_content(processor_result.output_file))
             effected_files = effected_files + processor_result.effected_files
-            if self.render_options.javascript_dom_bind:
-                content.append(self.render_options.javascript_dom_bind.generate_bind_command(self.render_source, context, target_element))
+            if self.render_options.js_dom_bind:
+                content.append(self.render_options.js_dom_bind.generate_bind_command(self.render_source, context, target_element))
 
         return ''.join(content), effected_files
 

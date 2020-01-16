@@ -10,7 +10,7 @@ class BigpipeRenderOptions(object):
                  js_bundle_link_dependencies: bool = None,
                  css_bundle_link_dependencies: bool = None,
                  css_complete_dependencies_by_js: bool = None,
-                 javascript_dom_bind: JavascriptDOMBind = None):
+                 js_dom_bind: JavascriptDOMBind = None):
 
         self.js_processor_name = js_processor_name
         self.css_processor_name = css_processor_name
@@ -18,4 +18,4 @@ class BigpipeRenderOptions(object):
         self.js_bundle_link_dependencies = js_bundle_link_dependencies
         self.css_bundle_link_dependencies = css_bundle_link_dependencies
         self.css_complete_dependencies_by_js = css_complete_dependencies_by_js
-        self.javascript_dom_bind = javascript_dom_bind
+        self.js_dom_bind = js_dom_bind

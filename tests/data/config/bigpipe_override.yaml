@@ -1,0 +1,14 @@
+bigpipe:
+  rendered_output_path: ${full_path:data_output}
+  static_uri:
+  is_production_mode: true
+
+  processors:
+    jsx:
+      params:
+        code_base_directories:
+          - ${full_path:data}
+    css:
+      params:
+        code_base_directories:
+          - ${full_path:data}
