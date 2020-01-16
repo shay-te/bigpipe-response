@@ -16,7 +16,6 @@ the project was inspired and using  facebook bigpipe principals. [(BigPipe: Pipe
 
     pip install bigpipe-response
 
-
 ### Prerequisites
 
 bigpipe response was developed using django version 2.2.4.
@@ -72,19 +71,105 @@ Bigpipe.init(config: DictConfig, processors: list = [])
 #### couple of way to load configuration
 ##### 1. OmegaConf load the file
 ```python
+import os
+from omegaconf import OmegaConf
+project_path = os.path.dirname(__file__)
+OmegaConf.register_resolver('full_path', lambda sub_path: os.path.join(project_path, sub_path))
 config = OmegaConf.load(os.path.join(os.path.dirname(__file__), 'conf', 'bigpipe_response.yaml'))
 Bigpipe.init(config.bigpipe)
 ```
  
 The [above configuration](#basic_configuration) is partial config, while `Bigpipe.init` needs the complete configuration file. 
 
-2. Use hydra compose   
-1. Use [hydra](https://hydra.cc/) to handle the "main" function. see an example here 
+##### 2. Leverage [hydra](https://hydra.cc/) to configure the entire application.
+###### bigpipe_override.yaml
+```yaml
+defaults:
+  - bigpipe
+  - bigpipe_override
+
+django:
+  port: 8080
+  params:
+    - runserver
+    - ${django.port}
+
+core_lib:
+  db:
+    protocol: mysql
+    username: test
+    password: test
+    host: localhost
+    port: 3306
+    file: test
+
+hydra: # tell hydra to use the same output directory
+  run:
+    dir: outputs
+``` 
+
+###### < your django app >/manage.py
+```python
+@hydra.main(config_path="../config/app_config.yaml")
+def main(cfg):
+   ...
+    if os.environ.get('RUN_MAIN') == 'true':
+        OmegaConf.register_resolver('full_path', lambda sub_path: os.path.join(project_path, sub_path))
+        from bigpipe_response.bigpipe import Bigpipe
+        Bigpipe.init(cfg.bigpipe)  # Setup bigpipe
+        CoreLib(cfg.demo)  # Setup app instance
+    ...
+    execute_from_command_line(setup_django_params(cfg))
+
+
+def setup_django_params(cfg):  # sys.argv is a list of string, django expect port to be a string.
+    result = [str(cfg.django.params[i]) for i in range(len(cfg.django.params))]
+    result.insert(0, __file__)  # set manage.py
+    return result
+
+def handle_kill(signum, frame):
+    print('Signal terminate received will shutdown bigpipe')
+    from bigpipe_response.bigpipe import Bigpipe
+    Bigpipe.get().shutdown()
+
+if __name__ == '__main__':
+    signal.signal(signal.SIGTERM , handle_kill)
+    signal.signal(signal.SIGINT, handle_kill)
+    main()      
+```   
 
  
+  
  
- 
-   
+## What can i do with bigpipe response 
+
+##### 1. Pipelining web pages for high performance
+Pipelining web pages allow us to stream all available content and resources back to the browser by using single/initial HTTP connection made to fetch HTML page.
+
+###### pros:    
+* no need to wait for javascript code to ajax and fetch data  
+* more connection available by the browser for resources 
+* no network time for opening more TCP(HTTP) connection [1](https://www.cse.iitk.ac.in/users/dheeraj/cs425/lec14.html)
+###### cons:    
+* dismisses the browser cache mechanism
+
+##### 2. No Setup Required
+There is no need for compiling, preparing, optimizing, uglifiing source files
+all is done automatically by response configuration.
+
+##### 3. Fast websites with not effort.
+Bigpipe Response is analyzing and building exactly what needed and send it back to the browser.    
+this includes `HTML, JavaScript, JavaScript Server Side Rendeing, SASS, i18n. and more`
+
+##### 6. Plug-able 
+Use any Javascript framework and more. by creating a custom processor you can easily pipe any source file.  
+by default [React](https://reactjs.org/) is supported out of the box.
+
+##### 4. Packing easy control 
+Bigpipe Response let you config what resource to load, how to bundle it and how to embed it by telling the response object exactly what you need.  
+
+##### 5. i18n optimization
+Bigpipe Response uses django built-in internalization and extends it to be supported by javascript components and server side rendering. 
 
 
 ### Example Responses
@@ -169,10 +254,11 @@ def search(request):
         Pagelet(request, 'page-bottom', view_main.page_bottom, {}),  
     ]
     # create a new BigpipeResponse object. that will render the "search.html" using django template engine.
-    # will call all pagelets and fill then in the designated position.  
+    # will pass to template the context of {'user_id': request.user.id, 'css_link': ['/public/<css bundle files>'], 'js_link': ['/public/<js bundle files>']}
+    # will call all pagelets and fill them in the designated position.  
     # will create/load "base_js_function.js" file content and embed it the page HTML page in a designated "<script>" tag
     # will create/load library bundle as load it as a link
-    # will create a bindle of javascript by the "main.scss" file
+    # will create a bundle of javascript by the "main.scss" file
     return BigpipeResponse(request,
                            render_type=BigpipeResponse.RenderType.TEMPLATE,
                            render_source='search.html',
@@ -183,6 +269,10 @@ def search(request):
 
 @require_GET
 def search_bar(request):
+    # create a new BigpipeResponse object. that will bundle the "SearchBarViewController" react component and dependencies.
+    # include also the "networkLocation.js" and add to the bundle.
+    # add javascript call to render the component "SearchBarViewController" with properties from  the "render_context"
+    # embed javascript content into HTML page in a designated "<script>" tag
     return BigpipeResponse(request,
                            render_type=BigpipeResponse.RenderType.JAVASCRIPT,
                            render_source='SearchBarViewController',
@@ -191,6 +281,9 @@ def search_bar(request):
 
 @require_GET
 def search_profiles(request, last_activity_time):
+    # create a new BigpipeResponse object. that will bundle the "ProfilesBoxViewController" react component and dependencies.
+    # include also the "networkLocation.js" and add to the bundle
+    # generate a i18n json and append it to the "render_context" 
     return BigpipeResponse(request,
                            render_type=BigpipeResponse.RenderType.JAVASCRIPT,
                            render_source='ProfilesBoxViewController',
@@ -203,40 +296,14 @@ def search_profiles(request, last_activity_time):
 ```python
 @require_GET
 def page_bottom(request):
+    # create a new BigpipeResponse object. that will render to HTML the "PageBottomReactComponent" react component.
+    # and will pass the "context" as react props. 
+    context = {...}
     return BigpipeResponse(request,
                            render_type=BigpipeResponse.RenderType.JAVASCRIPT_RENDER,
+                           render_context=context,
                            render_source='PageBottomReactComponent')
 ```
-
-## What can i do with bigpipe response 
-
-##### 1. Pipelining web pages for high performance
-Pipelining web pages allow us to stream all available content and resources back to the browser by using single/initial HTTP connection made to fetch HTML page.
-
-####### pros: 
-* no need to wait for javascript code to ajax and fetch data  
-* more connection available by the browser for resources 
-* no network time for opening more TCP(HTTP) connection [1](https://www.cse.iitk.ac.in/users/dheeraj/cs425/lec14.html)
-####### cons: 
-* dismisses the browser cache mechanism
-
-##### 2. No Setup Required
-There is no need for compiling, preparing, optimizing, uglifiing source files
-all is done automatically by response configuration.
-
-##### 3. Fast websites with not effort.
-Bigpipe Response is analyzing and building exactly what needed and send it back to the browser.    
-this includes `HTML, JavaScript, JavaScript Server Side Rendeing, SASS, i18n. and more`
-
-##### 6. Plug-able 
-Use any Javascript framework and more. by creating a custom processor you can easily pipe any source file.  
-by default [React](https://reactjs.org/) is supported out of the box.
-
-##### 4. Packing easy control 
-Bigpipe Response let you config what resource to load, how to bundle it and how to embed it by telling the response object exactly what you need.  
-
-##### 5. i18n optimization
-Bigpipe Response uses django built-in internalization and extends it to be supported by javascript components and server side rendering. 
 
 ### Running tests
 
