@@ -4,8 +4,6 @@ import re
 from abc import abstractmethod
 from collections import Iterable
 
-from omegaconf import OmegaConf
-
 from bigpipe_response.remote.js_processor_client import JSRemoteClient
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer

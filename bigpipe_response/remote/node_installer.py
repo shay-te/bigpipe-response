@@ -38,13 +38,15 @@ class NodeInstaller(object):
         node_modules_dir = os.path.join(self.js_folder, 'node_modules')
         if not os.path.isdir(node_modules_dir):
             self.logger.info('WAIT!!. patience please. First run takes a while. "node_modules" folder missing installing all dependencies')
-            self.__install_packages(self.js_folder, local_packages.values())
-            self.__install_packages(self.js_folder, packages)
+            if local_packages.values():
+                self.__install_packages(self.js_folder, local_packages.values())
+            if packages:
+                self.__install_packages(self.js_folder, packages)
         else:
             packages_diff = []
             package_lock_json_file = os.path.join(self.js_folder, 'package-lock.json')
             if not os.path.isfile(package_lock_json_file):
-                packages_diff = packages
+                packages_diff = packages + local_packages
             else:
                 with open(package_lock_json_file) as file:
                     dependencies = json.loads(file.read(), strict=False)['dependencies']

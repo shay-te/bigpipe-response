@@ -2,24 +2,21 @@ import logging
 import os
 
 from hydra.utils import instantiate
+from omegaconf import DictConfig
 
 from bigpipe_response.javascript_manager import JavascriptManager
 from bigpipe_response.remote.js_processor_client import JSRemoteClient
 from bigpipe_response.remote.remote_client_server import RemoteClientServer
 
-from omegaconf import OmegaConf
-
 from bigpipe_response.conf.bigpipe_settings import BigpipeSettings
 from bigpipe_response.processors.base_file_processor import BaseFileProcessor
 from bigpipe_response.processors.base_processor import BaseProcessor
-from bigpipe_response.processors.i18n_processor import I18nProcessor
-from bigpipe_response.processors.remote_js_file_processor import RemoteJsFileProcessor
 
 
 class ProcessorsManager(object):
 
-    def __init__(self, conf, processors: list = []):
-        self.conf = conf
+    def __init__(self, config: DictConfig, processors: list = []):
+        self.conf = config
         self.logger = logging.getLogger(self.__class__.__name__)
         #
         # set output directory

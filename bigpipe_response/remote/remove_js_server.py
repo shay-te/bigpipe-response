@@ -33,7 +33,7 @@ class RemoteJsServer(object):
     def start_server(self, port):
         if self.process:
             raise EnvironmentError('RemoteJsServer is already running.')
-        self.logger.info('Initializing RemoteJsServer. Attempt to start remote javascript server on port  port {}'.format(port))
+        self.logger.info('Initializing RemoteJsServer. Attempt to start remote javascript server on port {}'.format(port))
         try:
             token = self.__generate_token()
 
