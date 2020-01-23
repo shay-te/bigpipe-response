@@ -8,11 +8,11 @@
 module.exports = {
   title: 'Bigpipe Response',
   tagline: 'Fast Web Sites Loading',
-  url: 'https://github.com/shacoshe/bigpipe-response-docs',
+  url: 'https://github.com/shacoshe/bigpipe-response',
   baseUrl: '/',
   favicon: 'img/favicon.ico',
   organizationName: 'shacoshe', // Usually your GitHub org/user name.
-  projectName: 'bigpipe-response-docs', // Usually your repo name.
+  projectName: 'bigpipe-response', // Usually your repo name.
   themeConfig: {
     navbar: {
       title: 'Bigpipe Response',
