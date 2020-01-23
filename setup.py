@@ -22,10 +22,10 @@ setuptools.setup(
    packages=setuptools.find_packages(),
    include_package_data=True,
    install_requires=[str(ir.req) for ir in install_reqs],
-   license="BSD 3-Clause License",
+   license="MIT",
    classifiers=[
       "Programming Language :: Python :: 3",
-      "License :: OSI Approved :: BSD License",
+      "License :: OSI Approved :: MIT License",
       "Operating System :: OS Independent",
    ],
    python_requires='>=3.7'

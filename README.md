@@ -7,4 +7,4 @@ A standard [django](https://www.djangoproject.com/) `StreamingHttpResponse` resp
 Check the [website](https://bigpiperesponse.netlify.com/) for more information
 
 # What is bigpipe response
-BigpipepResponse in licenced under [BSD 3-Clause License](https://github.com/shacoshe/bigpipe-response/blob/master/LICENSE)
+BigpipepResponse in licenced under [MIT](https://github.com/shacoshe/bigpipe-response/blob/master/LICENSE)
