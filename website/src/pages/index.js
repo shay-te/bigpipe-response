@@ -94,7 +94,7 @@ function Home() {
   return (
     <Layout
       title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
+      description="Bigpipe Response <head />">
       <header className={classnames('hero hero--primary', styles.heroBanner)}>
         <div className="container">
           <h1 className="hero__title">{siteConfig.title}</h1>
@@ -108,6 +108,18 @@ function Home() {
               to={useBaseUrl('docs/main')}>
               Get Started
             </Link>
+
+<span className={styles['index-ctas-github-button']}>
+                  <iframe
+                    src="https://ghbtns.com/github-btn.html?user=shacoshe&amp;repo=bigpipe-response&amp;type=star&amp;count=false&amp;size=large"
+                    frameBorder={0}
+                    scrolling={0}
+                    width={160}
+                    height={30}
+                    style={{marginLeft: '10px', marginTop: '5px'}}
+                    title="GitHub Stars"
+                  />
+                </span>
           </div>
         </div>
       </header>
