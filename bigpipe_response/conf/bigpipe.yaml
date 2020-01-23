@@ -28,7 +28,7 @@ bigpipe:
       params:
         processor_name: jsx
         javascript_handler: bigpipe_response.processors.RollupReactProcessor.js
-        code_base_directories: null
+        source_paths: null
         source_ext:
           - js
           - jsx
@@ -46,7 +46,7 @@ bigpipe:
       class: bigpipe_response.processors.css_processor.CSSProcessor
       params:
         processor_name: css
-        code_base_directories: none
+        source_paths: none
         source_ext:
           - scss
         target_ext: css

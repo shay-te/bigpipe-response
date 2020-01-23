@@ -29,7 +29,7 @@ The most basic processor object.
 
 ### BaseFileProcessor(BaseProcessor)
 * `validate_input` validates the source name format, source file registered and exists. 
-* scan for sources by the parameter `code_base_directories`. 
+* scan for sources by the parameter `source_paths`. 
 * store map of files name with no extension to file absolute path
 * in development mode will clean processed files after a source file has change
 

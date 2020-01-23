@@ -10,8 +10,8 @@ sidebar_label: Example
 
 Before getting started we need to tell bigpipe a couple of things.    
 `rendered_output_path` point to django public/static directory, bigpipe response will compile assets to a folder under this directory   
-`processors.jsx.params.code_base_directories` a list of folders telling bigpipe where Javascript files are located         
-`processors.css.params.code_base_directories` a list of folders telling bigpipe where SCSS files are located         
+`processors.jsx.params.source_paths` a list of folders telling bigpipe where Javascript files are located         
+`processors.css.params.source_paths` a list of folders telling bigpipe where SCSS files are located         
 `is_production_mode` boolean indicating if to minify resources and allow to debug errors in the browser   
 
 The following configuration contains only the mandatory options, for more advanced and complete configuration, go [here](./configuration.md)    
@@ -26,12 +26,12 @@ bigpipe:
   processors:
     jsx:
       params:
-        code_base_directories:
+        source_paths:
           - ${full_path:client\js}
           - ${full_path:client\react}
     css:
         params:
-          code_base_directories:
+          source_paths:
             - ${full_path:client}
 ```
 

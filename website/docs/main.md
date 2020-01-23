@@ -13,7 +13,7 @@ the project was inspired and using facebook bigpipe principals. [(BigPipe: Pipel
 
     pip install bigpipe-response
 
-## Prerequisites
+## Requirements
 
     `django > 2.2.4`, `python > 3.7`
 

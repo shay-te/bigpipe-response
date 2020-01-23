@@ -14,7 +14,7 @@ from bigpipe_response.processors.base_processor import BaseProcessor
 class BaseFileProcessor(BaseProcessor):
 
     # example values: source_ext: scss, target_ext: css
-    def __init__(self, processor_name: str, code_base_directories: list, source_ext: list, target_ext: str, exclude_dir=None):
+    def __init__(self, processor_name: str, source_paths: list, source_ext: list, target_ext: str, exclude_dir=None):
         BaseProcessor.__init__(self, processor_name, target_ext)
 
         if not source_ext or not target_ext:
@@ -23,14 +23,14 @@ class BaseFileProcessor(BaseProcessor):
         if not isinstance(source_ext, Iterable) or not isinstance(target_ext, str):
             raise ValueError('"source_ext" should be a list and "target_ext" should be a string')
 
-        if not code_base_directories:
-            raise ValueError('code_base_directories cannot be None')
+        if not source_paths:
+            raise ValueError('source_paths cannot be None')
 
-        if not isinstance(code_base_directories, Iterable):
-            raise ValueError('code_base_directories need to be a list of paths to scan')
+        if not isinstance(source_paths, Iterable):
+            raise ValueError('source_paths need to be a list of paths to scan')
 
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.code_base_directories = code_base_directories
+        self.source_paths = source_paths
         self.source_ext = source_ext
         self.target_ext = target_ext
         self.exclude_dir = exclude_dir
@@ -40,8 +40,8 @@ class BaseFileProcessor(BaseProcessor):
         self._processed_files = []
         self.is_production_mode = None
 
-        for i in range(len(self.code_base_directories)):  # Omegaconf resolvers will be  will translated this way
-            code_base_directory = self.code_base_directories[i]
+        for i in range(len(self.source_paths)):  # Omegaconf resolvers will be  will translated this way
+            code_base_directory = self.source_paths[i]
             if os.path.isdir(code_base_directory):
                 self.__scan_folder(code_base_directory)
             else:
@@ -50,8 +50,8 @@ class BaseFileProcessor(BaseProcessor):
     def on_start(self, js_remote_client: JSRemoteClient, is_production_mode: bool, output_dir: str):
         if not is_production_mode:
             self.observer = Observer()
-            for i in range(len(self.code_base_directories)):  # Omegaconf resolvers will be  will translated this way
-                code_base_directory = self.code_base_directories[i]
+            for i in range(len(self.source_paths)):  # Omegaconf resolvers will be  will translated this way
+                code_base_directory = self.source_paths[i]
                 self.observer.schedule(SourceChangesHandler(self), path=code_base_directory, recursive=True)
             self.observer.start()
 
@@ -62,7 +62,7 @@ class BaseFileProcessor(BaseProcessor):
             raise ValueError('Component by source: [{}]. only string that contains letters, numbers, underscores and dashes are allowed'.format(source))
 
         if source not in self._component_to_file:
-            raise ValueError('render_source: "{}". is not registerd in processor "{}". The folder {} was scanned. but by name "{}" dose not exists. '.format(source, self.processor_name, self.code_base_directories, source))
+            raise ValueError('render_source: "{}". is not registerd in processor "{}". The folder {} was scanned. but by name "{}" dose not exists. '.format(source, self.processor_name, self.source_paths, source))
 
         input_file = self._component_to_file[source]
         if not os.path.isfile(input_file):

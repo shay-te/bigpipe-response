@@ -65,15 +65,15 @@ class BigpipeSettings:
             processor_classes = get_class(conf_processors['class']).__bases__
             if BaseFileProcessor in processor_classes:
 
-                code_base_directories = OmegaConf.to_container(conf_processors.params.code_base_directories, resolve=True)
+                source_paths = OmegaConf.to_container(conf_processors.params.source_paths, resolve=True)
 
-                if code_base_directories and not isinstance(code_base_directories, list):
-                    raise InvalidConfiguration('processor "{}"  must be supply "code_base_directories " as list'.format(conf_processors.params))
+                if source_paths and not isinstance(source_paths, list):
+                    raise InvalidConfiguration('processor "{}"  must be supply "source_paths " as list'.format(conf_processors.params))
 
-                for source_base_path in code_base_directories:
+                for source_base_path in source_paths:
                     if not os.path.exists(source_base_path):
                         raise InvalidConfiguration(
-                            'processor "{}" code_base_directories directory dose not exists. "{}"'.format(conf_processors.params, source_base_path))
+                            'processor "{}" source_paths directory dose not exists. "{}"'.format(conf_processors.params, source_base_path))
 
                 if not conf_processors.params.source_ext or not isinstance(OmegaConf.to_container(conf_processors.params.source_ext, resolve=True), list):
                     raise InvalidConfiguration('processors named "{}". source_ext musy be a populated list '.format(conf_processors.params.processor_name))

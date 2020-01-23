@@ -5,8 +5,8 @@ from bigpipe_response.processors.base_file_processor import BaseFileProcessor
 
 class CSSProcessor(BaseFileProcessor):
 
-    def __init__(self, processor_name: str, code_base_directories: list, source_ext: list, target_ext: str):
-        BaseFileProcessor.__init__(self, processor_name, code_base_directories, source_ext, target_ext, 'node_modules')
+    def __init__(self, processor_name: str, source_paths: list, source_ext: list, target_ext: str):
+        BaseFileProcessor.__init__(self, processor_name, source_paths, source_ext, target_ext, 'node_modules')
         self.include_paths = self.__generate_include_paths()
         self.is_production_mode = None
 
@@ -51,7 +51,7 @@ class CSSProcessor(BaseFileProcessor):
 
     def __generate_include_paths(self):
         result = []
-        for code_base_dir in self.code_base_directories:
+        for code_base_dir in self.source_paths:
             for dir in os.walk(code_base_dir):
                 result.append(dir[0])
         return result

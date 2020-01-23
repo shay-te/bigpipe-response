@@ -38,13 +38,13 @@ bigpipe:
     jsx: 
       # create "RemoteJsFileProcessor" named "jsx". and pass the params to the constructor 
       # will use this javascript file "bigpipe_response.processors.RollupReactProcessor.js"
-      # will scan for files with the "source_ext" under the "code_base_directories" 
+      # will scan for files with the "source_ext" under the "source_paths" 
       # and will convert any resource to the "target_ext" extension.
       class: bigpipe_response.processors.remote_js_file_processor.RemoteJsFileProcessor
       params:
         processor_name: jsx
         javascript_handler: bigpipe_response.processors.RollupReactProcessor.js
-        code_base_directories: null # * list of directories pointing to javascript/react code.
+        source_paths: null # * list of directories pointing to javascript/react code.
         source_ext:
           - js
           - jsx
@@ -65,7 +65,7 @@ bigpipe:
       class: bigpipe_response.processors.css_processor.CSSProcessor
       params:
         processor_name: css
-        code_base_directories: none
+        source_paths: none
         source_ext:
           - scss
         target_ext: css

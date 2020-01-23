@@ -6,9 +6,9 @@ bigpipe:
   processors:
     jsx:
       params:
-        code_base_directories:
+        source_paths:
           - ${full_path:data}
     css:
       params:
-        code_base_directories:
+        source_paths:
           - ${full_path:data}
