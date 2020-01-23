@@ -8,7 +8,7 @@
 module.exports = {
   title: 'Bigpipe Response',
   tagline: 'Fast Web Sites Loading',
-  url: 'https://github.com/shacoshe/bigpipe-response',
+  url: 'https://bigpiperesponse.netlify.com',
   baseUrl: '/',
   favicon: 'img/favicon.ico',
   organizationName: 'shacoshe', // Usually your GitHub org/user name.
