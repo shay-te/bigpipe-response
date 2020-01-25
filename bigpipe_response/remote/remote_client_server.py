@@ -89,11 +89,7 @@ class RemoteClientServer(object):
         remote_js_server = RemoteJsServer(self.js_folder, self.is_production)
 
         port_scan_start = self.port_start
-        self.logger.info(
-            "Looking for available port in range ({} - {})".format(
-                self.port_start, self.port_end
-            )
-        )
+        self.logger.info('Looking for available port in range "{} - {}"'.format(self.port_start, self.port_end))
         while port_scan_start < self.port_end:
             port = self.__scan_for_available_port(port_scan_start, self.port_end)
             if port:
@@ -101,6 +97,8 @@ class RemoteClientServer(object):
                     token = remote_js_server.start_server(port)
                     self.remote_js_server = remote_js_server
                     self.remote_js_client = RemoteJSClient("http://localhost:{}".format(port), token)
+                    self.logger.info('Remote Javascript Server started at port "{}".')
+                    self.logger.info('Registering processors to: remote js server.')
                     self.__send_register_processors()
                     return
                 except BaseException as ex:

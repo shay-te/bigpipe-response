@@ -102,4 +102,4 @@ class RemoteJsServer(object):
 
     def __output_reader(self, name: str, stream):
         for line in iter(stream.readline, b''):
-            self.logger.debug('{}: {}'.format(name, line.decode('utf-8')))
+            self.logger.info('{}: {}'.format(name, line.strip().decode('utf-8')))

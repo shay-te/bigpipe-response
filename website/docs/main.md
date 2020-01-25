@@ -15,7 +15,7 @@ the project was inspired and using facebook bigpipe principals. [(BigPipe: Pipel
 
 ## Requirements
 
-    `django > 2.2.4`, `python > 3.7`
+    django > 2.2.4, python > 3.7
 
 ## Running tests
 
@@ -24,19 +24,12 @@ the project was inspired and using facebook bigpipe principals. [(BigPipe: Pipel
 
 ## The source
 
-[https://github.com/shacoshe/bigpipe-response](https://github.com/shacoshe/bigpipe-response)
+[https://github.com/shacoshe/core-lib](https://github.com/shacoshe/core-lib)
    
 ## Example project
 
 [https://github.com/shacoshe/bigpipe-response-example](https://github.com/shacoshe/bigpipe-response-example)
 
-## Pros:    
-* no need to wait for javascript code to ajax and fetch data/code  
-* more connection available by the browser for resources 
-* no network time for opening more TCP/HTTP connections [1](https://www.cse.iitk.ac.in/users/dheeraj/cs425/lec14.html)
-
-## Cons:    
-* dismisses the browser cache mechanism for embedded results
 
 ## Contributing
 
@@ -50,5 +43,5 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 ## License
 
-This project is licensed under the BSD 3-Clause License - see the [LICENSE.md](LICENSE) file for details
+This project is licensed under the MIT - see the [LICENSE](https://github.com/shacoshe/bigpipe-response/blob/master/LICENSE) file for details
 

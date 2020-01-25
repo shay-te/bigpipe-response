@@ -39,7 +39,7 @@ class JavascriptManager(object):
 
     def __copy_assets(self):
         # copy bigpipe.js to public dir
-        if not os.path.join(self.conf.rendered_output_path, "bigpipe.js"):
+        if not os.path.isfile(os.path.join(self.conf.rendered_output_path, "bigpipe.js")):
             self.logger.info('Coping "bigpipe.js" to public directory')
             copyfile(
                 os.path.join(self.local_javascript_folder, "browser", "bigpipe.js"),
