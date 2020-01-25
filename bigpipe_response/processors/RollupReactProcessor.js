@@ -1,21 +1,18 @@
 var BaseProcessor = require('BaseProcessor');
 var build = require('RollupBaseBuild');
-var jsx = require('rollup-plugin-jsx');
-
-var plugins = [ jsx( {factory: 'React.createElement', 'passUnknownTagsToFactory': true} ) ];
-
-//const commonjs = require('@rollup/plugin-commonjs');
-//const resolve = require('@rollup/plugin-node-resolve');
-//const babel = require('rollup-plugin-babel');
-//        babel({
-//            exclude: 'node_modules/**',
-//            plugins: ['@babel/plugin-transform-react-jsx']
-//        }),
-
 var React = require('react');
 var ReactDOMServer = require('react-dom/server');
 var createReactClass = require('create-react-class');
 
+const babel = require('rollup-plugin-babel');
+
+var plugins = [
+    babel({
+        exclude: 'node_modules/**',
+        plugins: ['@babel/plugin-transform-react-jsx', '@babel/plugin-proposal-class-properties'],
+        presets: ['@babel/preset-env']
+    }),
+];
 
 var BaseComponent = createReactClass({
 	getDefaultProps: function() {

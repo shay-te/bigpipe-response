@@ -36,12 +36,13 @@ async function build(isProduction, input_file_path, output_file_path, include, e
 
     plugins.push(includeFiles(include, exclude))
 
-    if(isProduction) {
-        plugins.push(uglify())
-    }
-
     if(extra_plugins && extra_plugins.constructor === Array) {
         plugins = plugins.concat(extra_plugins);
+    }
+
+
+    if(isProduction) {
+        plugins.push(uglify())
     }
 
     var inputOptions = {

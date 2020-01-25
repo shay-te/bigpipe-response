@@ -58,8 +58,8 @@ class BaseFileProcessor(BaseProcessor):
     def validate_input(self, source: str):
         super().validate_input(source)
 
-        if not re.match('^[A-Za-z0-9_-]*$', source):
-            raise ValueError('Component by source: [{}]. only string that contains letters, numbers, underscores and dashes are allowed'.format(source))
+        if not re.match('^[@A-Za-z0-9_-]*$', source):
+            raise ValueError('Component by source: [{}]. only string that contains letters, numbers, at, underscores and dashes are allowed'.format(source))
 
         if source not in self._component_to_file:
             raise ValueError('render_source: "{}". is not registerd in processor "{}". The folder {} was scanned. but by name "{}" dose not exists. '.format(source, self.processor_name, self.source_paths, source))
@@ -70,7 +70,7 @@ class BaseFileProcessor(BaseProcessor):
 
     def process_source(self, source: str, options: dict = {}, include_dependencies: list = [], exclude_dependencies: list = []):
         input_file = self._component_to_file[source]
-        output_file = self.build_output_file_path(os.path.basename(input_file), include_dependencies, exclude_dependencies)
+        output_file = self.build_output_file_path(os.path.basename(input_file), options, include_dependencies, exclude_dependencies)
 
         if not self.is_production_mode:
             self._processed_files.append(output_file)
@@ -80,7 +80,7 @@ class BaseFileProcessor(BaseProcessor):
     def render(self, source: str, context: dict, i18n: dict):
         super().render(source, context, i18n)
         input_file = self._component_to_file[source]
-        output_file = self.build_output_file_path(os.path.basename(input_file), self.target_ext)
+        output_file = self.build_output_file_path(os.path.basename(input_file))
         if not os.path.isfile(output_file):
             self.process_resource(input_file, output_file, [], [], {})
         return self.render_resource(output_file, context, i18n)

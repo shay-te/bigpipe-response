@@ -5,6 +5,7 @@ from bigpipe_response.bigpipe_response import BigpipeResponse
 from django.conf import settings
 from bigpipe_response.bigpipe import Bigpipe
 from bigpipe_response.bigpipe_render_options import BigpipeRenderOptions
+from bigpipe_response.content_result import ContentResult
 from bigpipe_response.dependencies_marshalling import DependenciesMarshalling
 
 from django.template import loader
@@ -50,12 +51,11 @@ class ContentLoader(object):
         #
         # content handing
         #
+
         # i18n
         i18n = self.__run_processor_i18n(self.render_source, self.render_options.i18n_processor_name, self.i18n_dependencies)
 
-
-
-        # js
+        # javascript
         js_content_proc_to_dep, js_processors_name_order = self.__group_dependencies(False, self.js_dependencies, self.render_options.js_processor_name)
         js, js_effected_files = self.__get_js_content(target_element,
                                                       render_context_dict,
@@ -73,7 +73,14 @@ class ContentLoader(object):
 
         content = self.__get_content(render_context_dict, i18n)
 
-        return content, js, css, i18n, js_effected_files, css_effected_files
+        return ContentResult(content,
+                             js,
+                             css,
+                             i18n,
+                             render_context_dict['js_links'],
+                             render_context_dict['css_links'],
+                             js_effected_files,
+                             css_effected_files)
 
     def __group_dependencies(self, links_only: bool, dependencies: list, default_processor: str, extra_dependencies_list: list = []):
         content = {}
@@ -97,9 +104,20 @@ class ContentLoader(object):
 
         return content, list(processors_order)
 
-    def __get_processor_dependencies(self, processors_name_order: list, processor_name_to_sources: dict, exclude_dependencies: list):
+    #
+    # __run_processor_content_as_string will Run processors by the order of the processors names
+    # "processors_name_ordered": the order of processors described in the dependencies list.
+    # "processor_name_to_sources": keys are the "processor_name" and values is the list of dependencies to run
+    # "exclude_dependencies": When dependencies to exclude.
+    #
+    # returns tuple:
+    # (content, effected_files) .
+    # content is list containing the content of all processors run
+    # effected_files what files was processed to collected the content
+    #
+    def __run_processor_content_as_string(self, processors_name_ordered: list, processor_name_to_sources: dict, exclude_dependencies: list):
         content, effected_files = [], []
-        for processor_name in processors_name_order:
+        for processor_name in processors_name_ordered:
             if processor_name in processor_name_to_sources:
                 dependencies = processor_name_to_sources[processor_name]
                 processor_result = self.__run_processor(processor_name,
@@ -112,7 +130,7 @@ class ContentLoader(object):
         return content, effected_files
 
     def __get_js_content(self, target_element: str, context: dict, processors_name_order: list, processor_name_to_sources: dict, exclude_dependencies: list):
-        content, effected_files = self.__get_processor_dependencies(processors_name_order, processor_name_to_sources, exclude_dependencies)
+        content, effected_files = self.__run_processor_content_as_string(processors_name_order, processor_name_to_sources, exclude_dependencies)
 
         if self.render_type == BigpipeResponse.RenderType.JAVASCRIPT:
             processor_result = self.__run_processor(self.render_source_processor_name,
@@ -126,7 +144,7 @@ class ContentLoader(object):
         return ''.join(content), effected_files
 
     def __get_css_content(self, processors_name_order: list, processor_name_to_sources: dict, exclude_dependencies: list):
-        content, effected_files = self.__get_processor_dependencies(processors_name_order, processor_name_to_sources, [])
+        content, effected_files = self.__run_processor_content_as_string(processors_name_order, processor_name_to_sources, [])
 
         # NOTICE! NOT YET SUPPORTED.
         # effected files will be only 'include_dependencies' and NOT 'css_dependencies_result.effected_files'.
@@ -171,20 +189,22 @@ class ContentLoader(object):
     #
     def __get_dependencies_links(self, processors_name_order: list, processor_name_to_sources: list, bundle_dependencies: bool):
         links, output_files = [], []
+        render_options = {'output_file_prefix': '@'}
         for processor_name in processors_name_order:
             # Validating that 'processor_name' exists in the include list.
-            # since 'processors_name_order' is a list of all processors names (links and content).
+            # since 'processors_name_ordered' is a list of all processors names (links and content).
             # it may be that the processor_name dose not have links to process
             if processor_name in processor_name_to_sources:
                 sources = processor_name_to_sources[processor_name]
                 if bundle_dependencies:
-                    source_name = 'bundle_{}'.format(self.render_source if self.render_source else sources[0])
-                    output_files = output_files + [self.__run_processor(processor_name, source_name, sources, generate_missing_source=True).output_file]
+                    source_name = self.render_source if self.render_source else sources[0]
+                    output_files = output_files + [self.__run_processor(processor_name, source_name, sources, options=render_options, generate_missing_source=True).output_file]
                 else:
-                    output_files = output_files + [self.__run_processor(processor_name, source_name, [], generate_missing_source=False).output_file for source_name in sources]
+                    output_files = output_files + [self.__run_processor(processor_name, source_name, options=render_options, generate_missing_source=False).output_file for source_name in sources]
 
         static_uri = Bigpipe.get().config.static_uri.strip('/') if Bigpipe.get().config.static_uri else ''
 
+        # Build the path for the browser
         for output_file in output_files:
             output_directory_length = len(Bigpipe.get().config.rendered_output_path)
             output_file = output_file[output_directory_length::].replace('\\', '/')
@@ -214,7 +234,7 @@ class ContentLoader(object):
     # helpers
     #
     def __get_context(self, context, js_links_processor_name_to_sources: list, css_links_processor_name_to_sources: list, js_processors_ordered, css_processors_ordered):
-        links = {}
+        links = {'js_links': [], 'css_links': []}
         if js_links_processor_name_to_sources:
             links['js_links'] = self.__get_dependencies_links(js_processors_ordered, js_links_processor_name_to_sources, self.render_options.js_bundle_link_dependencies)
         if css_links_processor_name_to_sources:

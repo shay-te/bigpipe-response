@@ -8,6 +8,7 @@ window.renderI18n = function(i18n) {
     }
 }
 
+var _isArr = function(o) {return o && o.constructor === Array;};
 window.renderPagelet = function(p) {
     try {
         var el = document.getElementById(p.target);
@@ -15,13 +16,10 @@ window.renderPagelet = function(p) {
             console.error("ERROR: pagelet fill, id:" + p.html + " Not exist");
             return;
         }
-
         if(p.i18n) { renderI18n(p.i18n); }
-
         if(p.html) {
             el.innerHTML = p.html;
         }
-
         var head=document.getElementsByTagName("head")[0];
         if(p.css) {
             var style  = document.createElement('style');
@@ -38,6 +36,20 @@ window.renderPagelet = function(p) {
             script.type = "text/javascript";
             script.text = p.js;
             head.appendChild(script);
+        }
+        if(p.js_links && window._isArr(p.js_links)) {
+            for(var i in p.js_links) {
+                var script = document.createElement("script");
+                script.type = "text/javascript"; script.src = p.js_links[i];
+                head.appendChild(script);
+            }
+        }
+        if(p.css_links && window._isArr(p.css_links)) {
+            for(var i in p.css_links) {
+                var link = document.createElement("link");
+                link.type = "text/css"; link.rel = "stylesheet"; link.href = p.css_links[i];
+                head.appendChild(link);
+            }
         }
         if(p.remove) {
             var script = document.getElementById('script_' + p.target);

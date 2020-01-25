@@ -57,7 +57,7 @@ class BaseProcessor(object):
     # returns: processed source, output_file
     #
     def process_source(self, source: str, options: dict = {}, include_dependencies: list = [], exclude_dependencies: list = []):
-        return source, self.build_output_file_path(source, include_dependencies, exclude_dependencies)
+        return source, self.build_output_file_path(source, options, include_dependencies, exclude_dependencies)
 
     #
     # called by bigpipe_response engine. this method will
@@ -125,13 +125,16 @@ class BaseProcessor(object):
     #
     # used by `process_source`/`process_source` method to generate the output filename format
     #
-    def build_output_file_path(self, input_file_name: str, include_dependencies: list = [], exclude_dependencies: list = []):
-        return os.path.join(self.output_dir, '{}.__.{}.__.{}-{}.{}'.format(input_file_name, self.processor_name, self.__dependencies_to_hash(include_dependencies), self.__dependencies_to_hash(exclude_dependencies), self.target_ext))
+    def build_output_file_path(self, input_file_name: str, options: dict = {}, include_dependencies: list = [], exclude_dependencies: list = []):
+        # return os.path.join(self.output_dir, '{}.!{}!.{}-{}.{}'.format(input_file_name, self.processor_name, self.__dependencies_to_hash(include_dependencies), self.__dependencies_to_hash(exclude_dependencies), self.target_ext))
+
+        output_file_prefix = ''
+        if options and 'output_file_prefix' in options:
+            output_file_prefix = options['output_file_prefix']
+        return os.path.join(self.output_dir, '{}{}.!{}!.{}'.format(output_file_prefix, input_file_name, self.processor_name, self.target_ext))
 
     #
     # in the future bigpipe will make sure that pagelet will not use the same dependencies.
     #
-    def __dependencies_to_hash(self, dependencies_list: list):
-        # return hashlib.blake2b(str(dependencies_list).encode(), digest_size=5).hexdigest() if dependencies_list else '_' NOT YET SUPPORTED
-        return '_'
-
+    # def __dependencies_to_hash(self, dependencies_list: list):
+    #     return hashlib.blake2b(str(dependencies_list).encode(), digest_size=5).hexdigest() if dependencies_list else '_' NOT YET SUPPORTED

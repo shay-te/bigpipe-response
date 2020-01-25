@@ -9,6 +9,7 @@ from django.http import StreamingHttpResponse
 
 from bigpipe_response.bigpipe import Bigpipe
 from bigpipe_response.bigpipe_render_options import BigpipeRenderOptions
+from bigpipe_response.content_result import ContentResult
 from bigpipe_response.debugger.bigpipe_debugger import BigpipeDebugger
 
 
@@ -44,11 +45,11 @@ class BigpipeResponse(StreamingHttpResponse):
     def __stream_content(self):
         last_pagelet_target = None
         try:
-            content, js, css, i18n, js_effected_files, css_effected_files = self.content_loader.load_content('body', [], [])
-            self.processed_js_files = self.processed_js_files + js_effected_files
-            self.processed_css_files = self.processed_css_files + css_effected_files
+            content_result = self.content_loader.load_content('body', [], [])
+            self.processed_js_files = self.processed_js_files + content_result.js_effected_files
+            self.processed_css_files = self.processed_css_files + content_result.css_effected_files
 
-            for entry_content in self.__yield_content(content, js, css, i18n):
+            for entry_content in self.__yield_content(content_result):
                 yield entry_content
 
             que = queue.Queue()
@@ -69,10 +70,11 @@ class BigpipeResponse(StreamingHttpResponse):
                 error_target = 'Error in request source [{}]{}'.format(self.content_loader.render_source, ', on pagelet target element [{}]'.format(last_pagelet_target) if last_pagelet_target else '')
                 content, js, css = BigpipeDebugger.get_exception_content(error_target, (str(ex.errors) if hasattr(ex, 'errors') else str(ex)), traceback.format_exc())
                 i18n = {}
+                content_result_error = ContentResult(content, js, css, i18n, [], [], [], [])
                 if last_pagelet_target:
-                    yield self.__get_pagelet_content(last_pagelet_target, content, js, css, i18n)
+                    yield self.__get_pagelet_content(last_pagelet_target, content_result_error)
                 else:
-                    for entry_content in self.__yield_content(content, js, css, i18n):
+                    for entry_content in self.__yield_content(content_result_error):
                         yield entry_content
             else:
                 raise ex
@@ -84,10 +86,10 @@ class BigpipeResponse(StreamingHttpResponse):
             pagelet_response = pagelet.render()
             if isinstance(pagelet_response, BigpipeResponse):
 
-                content, js, css, i18n, js_effected_files, css_effected_files = pagelet_response.content_loader.load_content(pagelet.target, self.processed_js_files, self.processed_css_files)
-                self.processed_js_files = self.processed_js_files + js_effected_files
-                self.processed_css_files = self.processed_css_files + css_effected_files
-                result_queue.put(pagelet_response.__get_pagelet_content(pagelet.target, content, js, css, i18n))
+                content_result = pagelet_response.content_loader.load_content(pagelet.target, self.processed_js_files, self.processed_css_files)
+                self.processed_js_files = self.processed_js_files + content_result.js_effected_files
+                self.processed_css_files = self.processed_css_files + content_result.css_effected_files
+                result_queue.put(pagelet_response.__get_pagelet_content(pagelet.target, content_result))
             else:
                 logging.warning('for pagelets expected only bigpipe response to operate, will return response content. {}'.format(pagelet_response))
                 result_queue.put(pagelet_response)
@@ -97,26 +99,30 @@ class BigpipeResponse(StreamingHttpResponse):
     #
     # Yield content
     #
-    def __yield_content(self, content: str, js: str, css: str, i18n: dict):
-        if content:
-            yield content
-        if i18n:
-            yield '\n<script>\n\trenderI18n({})\n</script>\n'.format(json.dumps(i18n))
-        if css:
-            yield '\n<style>\n\t{}\n</style>\n'.format(css)
-        if js:
-            yield '\n<script>\n\t{}\n</script>\n'.format(js)
+    def __yield_content(self, content_result: ContentResult):
+        if content_result.content:
+            yield content_result.content
+        if content_result.i18n:
+            yield '\n<script>\n\trenderI18n({})\n</script>\n'.format(json.dumps(content_result.i18n))
+        if content_result.css:
+            yield '\n<style>\n\t{}\n</style>\n'.format(content_result.css)
+        if content_result.js:
+            yield '\n<script>\n\t{}\n</script>\n'.format(content_result.js)
 
-    def __get_pagelet_content(self, paglet_target: str, content: str, js: str, css: str, i18n: dict):
+    def __get_pagelet_content(self, paglet_target: str, content_result: ContentResult):
         result = {'target': paglet_target}
-        if css:
-            result['css'] = css
-        if content:
-            result['html'] = content
-        if js:
-            result['js'] = js
-        if i18n:
-            result['i18n'] = i18n
+        if content_result.css:
+            result['css'] =  content_result.css
+        if content_result.content:
+            result['html'] = content_result.content
+        if content_result.js:
+            result['js'] = content_result.js
+        if content_result.i18n:
+            result['i18n'] = content_result.i18n
+        if content_result.js_links:
+            result['js_links'] = content_result.js_links
+        if content_result.css_links:
+            result['css_links'] = content_result.css_links
         if Bigpipe.get().config.is_production_mode:
             result['remove'] = True
 

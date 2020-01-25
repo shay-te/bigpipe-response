@@ -15,7 +15,7 @@ class I18nProcessor(BaseProcessor):
 
     def process_source(self, source: str, options: dict = {}, include_dependencies: list = [], exclude_dependencies: list = []):
         input_file = '{}_{}'.format(source.replace('.', '_'), options['language'])
-        return input_file, self.build_output_file_path(input_file, include_dependencies, exclude_dependencies)
+        return input_file, self.build_output_file_path(input_file, options, include_dependencies, exclude_dependencies)
 
     def process_resource(self, source: str, output_file: str, include_dependencies: list, exclude_dependencies: list, options: dict = {}):
         if not options: raise ValueError('I18nProcessor [options] must be set')
