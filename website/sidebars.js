@@ -7,6 +7,6 @@
 
 module.exports = {
   docs: {
-    'Bigpipe Response': ['main', 'example', 'bigpipe_response', 'configuration', 'processors', 'custom_processors']
+    'Bigpipe Response': ['main', 'what_is_bigpipe', 'example', 'bigpipe_response', 'configuration', 'processors', 'custom_processors']
   },
 };
