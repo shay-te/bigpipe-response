@@ -55,7 +55,7 @@ class JavascriptManager(object):
 
         # copy i18n generates file into "js/dependencies" folder.
         # remote javascript base_processor will use this file as a dependency for server side rendering.
-        jsi18n_file = os.path.join(self.local_javascript_folder, "dependencies", "jsi18n.js")
+        jsi18n_file = os.path.join(self.local_javascript_folder, "browser", "jsi18n.js")
         if not os.path.isfile(jsi18n_file):
             self.logger.info('Generating django "jsi18n.js"file and making internal copy of it')
             with open(jsi18n_file, "wb") as jsi18n_file:

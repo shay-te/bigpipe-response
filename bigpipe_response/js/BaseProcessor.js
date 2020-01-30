@@ -17,7 +17,7 @@ class BaseProcessor {
     }
 
     _generateBaseModuleSource() {
-        var jsi18nPath = path.normalize(path.join(__dirname, 'dependencies', 'jsi18n.js'));
+        var jsi18nPath = path.normalize(path.join(__dirname, 'browser', 'jsi18n.js'));
         return fs.readFileSync(jsi18nPath, 'utf8') + // read django_i18n file
                "global.django = this.django; \n" + // make django_i18n object global
                "Object.getOwnPropertyNames(django).filter(function(property) { if(typeof django[property] == 'function') { global[property] = django[property]; } }); \n"; // move django_i18n methods to be global
