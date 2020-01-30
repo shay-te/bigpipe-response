@@ -1,0 +1,13 @@
+{
+  "name": "bigpipe_response_node",
+  "version": "1.0.0",
+  "description": "This is installation of bigpipe response remote javascript server",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Shay Tessler",
+  "license": "ISC",
+  "dependencies": {
+    "bigpipe_response": "file:D:/programming/eclipse_projects/bigpipe_response/bigpipe_response/js/bigpipe_response-1.0.0.tgz"
+  }
+}

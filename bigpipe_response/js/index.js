@@ -60,7 +60,7 @@ if(modeIndex == -1) {
     return;
 }
 
-var bigpipe_node_server = require('./remote_server/bigpipe_node_Server.js');
+var bigpipe_node_server = require('./remote_server/bigpipe_node_server.js');
 
 bigpipe_node_server.start(argv.port, argv.token, modeIndex ? true : false);
 

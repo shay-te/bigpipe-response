@@ -70,10 +70,10 @@ class BigpipeSettings:
                 if source_paths and not isinstance(source_paths, list):
                     raise InvalidConfiguration('processor "{}"  must be supply "source_paths " as list'.format(conf_processors.params))
 
-                for source_base_path in source_paths:
+                for sp_index in range(len(source_paths)):
+                    source_base_path = source_paths[sp_index ]
                     if not os.path.exists(source_base_path):
-                        raise InvalidConfiguration(
-                            'processor "{}" source_paths directory dose not exists. "{}"'.format(conf_processors.params, source_base_path))
+                        raise InvalidConfiguration('processor "{}" source_paths directory dose not exists. "{}"'.format(conf_processors.params, source_base_path))
 
                 if not conf_processors.params.source_ext or not isinstance(OmegaConf.to_container(conf_processors.params.source_ext, resolve=True), list):
                     raise InvalidConfiguration('processors named "{}". source_ext musy be a populated list '.format(conf_processors.params.processor_name))

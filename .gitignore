@@ -23,6 +23,7 @@ __pycache__/
 
 # BUILD
 bigpipe_response.egg-info/
-build/
+
+/build
 dist/
 .eggs

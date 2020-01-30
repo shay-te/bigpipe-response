@@ -41,18 +41,18 @@ class BaseFileProcessor(BaseProcessor):
         self.is_production_mode = None
 
         for i in range(len(self.source_paths)):  # Omegaconf resolvers will be  will translated this way
-            code_base_directory = self.source_paths[i]
-            if os.path.isdir(code_base_directory):
-                self.__scan_folder(code_base_directory)
+            source_path = self.source_paths[i]
+            if os.path.isdir(source_path):
+                self.__scan_folder(source_path)
             else:
-                raise ValueError('processor "{}". the code_base_directory "{}" dose not exists'.format(self.processor_name, code_base_directory))
+                raise ValueError('processor "{}". the source_paths "{}" dose not exists'.format(self.processor_name, source_path))
 
     def on_start(self, js_remote_client: JSRemoteClient, is_production_mode: bool, output_dir: str):
         if not is_production_mode:
             self.observer = Observer()
             for i in range(len(self.source_paths)):  # Omegaconf resolvers will be  will translated this way
-                code_base_directory = self.source_paths[i]
-                self.observer.schedule(SourceChangesHandler(self), path=code_base_directory, recursive=True)
+                source_path = self.source_paths[i]
+                self.observer.schedule(SourceChangesHandler(self), path=source_path, recursive=True)
             self.observer.start()
 
     def validate_input(self, source: str):
@@ -101,8 +101,8 @@ class BaseFileProcessor(BaseProcessor):
 
         self._processed_files = files_not_deleted
 
-    def __scan_folder(self, code_base_directory):
-        for root, dirnames, filenames in os.walk(code_base_directory):
+    def __scan_folder(self, source_path):
+        for root, dirnames, filenames in os.walk(source_path):
             for file in filenames:
                 if self.exclude_dir and self.exclude_dir in root:
                     continue

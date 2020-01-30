@@ -15,7 +15,7 @@ the project was inspired and using facebook bigpipe principals. [(BigPipe: Pipel
 
 ## Requirements
 
-    django > 2.2.4, python > 3.7
+    django > 2.2.4, python > 3.7, nodejs
 
 ## Running tests
 
