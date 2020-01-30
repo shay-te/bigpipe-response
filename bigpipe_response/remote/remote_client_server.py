@@ -4,7 +4,7 @@ import traceback
 import pkg_resources
 
 from bigpipe_response.remote.remote_js_client import RemoteJSClient
-from bigpipe_response.remote.remove_js_server import RemoteJsServer
+from bigpipe_response.remote.remote_js_server import RemoteJsServer
 import socket
 
 
@@ -38,6 +38,8 @@ class RemoteClientServer(object):
         arr = resourse_str.rsplit('.', 2)
         resource_path = arr[0]
         resource_name = '{}.{}'.format(arr[1], arr[2])
+        self.logger.info('Loading javascript resource. resource_path: "{}", :"{}'.format(resource_path, resource_name))
+
         if not pkg_resources.resource_exists(resource_path, resource_name):
             raise ValueError('processor_js_resource must dose not exists')
 

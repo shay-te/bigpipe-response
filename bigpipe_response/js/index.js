@@ -53,6 +53,7 @@ if (!argv.mode) {
     return;
 }
 
+
 var modes = ['DEVELOPMENT', 'PRODUCTION'];
 var modeIndex = modes.indexOf(argv.mode.toUpperCase())
 if(modeIndex == -1) {
@@ -60,8 +61,6 @@ if(modeIndex == -1) {
     return;
 }
 
+
 var bigpipe_node_server = require('./remote_server/bigpipe_node_server.js');
-
 bigpipe_node_server.start(argv.port, argv.token, modeIndex ? true : false);
-
-

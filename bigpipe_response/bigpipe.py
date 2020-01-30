@@ -41,6 +41,7 @@ class Bigpipe(object):
         from bigpipe_response.processors_manager import ProcessorsManager
 
         self.processors_manager = ProcessorsManager(self.conf, processors)
+        self.logger.info("Bigpipe Response Ready.")
 
     @staticmethod
     def init(config: DictConfig, processors: list = []):

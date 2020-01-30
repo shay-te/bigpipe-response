@@ -118,7 +118,11 @@ class BigpipeProcessorManager {
         return new Promise(function(resolve, reject) {
             if (process_file && fs.existsSync(process_file)) {
                 this._fileHash(process_file).then(function(fileHash) {
-                    var registered_process_file = path.join(__dirname, 'registered_processors', fileHash + '.js')
+                    var registered_processors_dir = path.join(__dirname, 'registered_processors');
+                    if (!fs.existsSync(registered_processors_dir)){
+                       fs.mkdirSync(registered_processors_dir);
+                    }
+                    var registered_process_file = path.join(registered_processors_dir, fileHash + '.js');
                     if(!fs.existsSync(registered_process_file)) {
                         fs.copyFile(process_file,
                                     registered_process_file,
