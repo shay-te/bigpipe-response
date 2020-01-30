@@ -11,6 +11,7 @@ include bigpipe_response/debugger/*.html
 
 # Include javascript
 recursive-include bigpipe_response/processors *.js
+recursive-include bigpipe_response/build *
 recursive-include bigpipe_response/js *
 
 # Exclude node installation fils
