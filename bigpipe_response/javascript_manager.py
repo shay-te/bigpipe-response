@@ -17,7 +17,7 @@ class JavascriptManager(object):
         self.local_javascript_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "js")
 
         if self.conf.java_script_install_folder and not os.path.isdir(self.conf.java_script_install_folder):
-            raise ValueError('Config "java_script_install_folder" was set to "{}". but the folder dose not exists'.format(self.conf.java_script_install_folder))
+            raise ValueError('Config "java_script_install_folder" is set to `{}`. but the folder dose not exists'.format(self.conf.java_script_install_folder))
 
         if self.conf.java_script_install_folder:
             self.javascript_folder = self.conf.java_script_install_folder

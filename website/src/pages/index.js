@@ -15,59 +15,37 @@ import styles from './styles.module.css';
 
 const features = [
   {
-    title: <>Pipelining Web Pages For High Performance</>,
+    title: <>No More Bundling</>,
     imageUrl: 'img/undraw_fast_loading_0lbh.svg',
     description: (
       <>
-        Stream content and resources using a single/initial HTTP connection made to fetch HTML page.
+        `Bigpipe Response` object will bundle code With minimum output bundle size.
+
+        The bundled code transformed using the build in <a>processors</a> that supports React/SCSS out of the box.
+
+        Processors are created by `configuration` `yaml` files And `code`.
+        It free more time to focus on the development of the application.
       </>
     ),
   },
   {
-    title: <>No Setup Required</>,
+    title: <>It Doesnt Override Anything</>,
     imageUrl: 'img/undraw_online_media_62jb.svg',
     description: (
       <>
-        There is no need for compiling, preparing, optimizing, uglifying source files
-        All is done automatically by response configuration.
+        There's need to change the existing code structure.
+        It's another tool in the belt, A response object the do much more.
       </>
     ),
   },
   {
-    title: <>Fast Websites With No Effort</>,
+    title: <>Optimization Of Performance Cost Time</>,
     imageUrl: 'img/undraw_dev_productivity_umsq.svg',
     description: (
       <>
-        Bigpipe Response is analyzing and building exactly what needed and send it back to the browser.
-        this includes `HTML, JavaScript, JavaScript Server Side Rendering, SASS, i18n. and more`
-      </>
-    ),
-  },
-  {
-    title: <>Plug-able Architecture</>,
-    imageUrl: 'img/undraw_apps_m7mh.svg',
-    description: (
-      <>
-        Use any Javascript framework and more. by creating a custom processor you can easily pipe any source file.
-        [React](https://reactjs.org/) is supported out of the box.
-      </>
-    ),
-  },
-  {
-    title: <>Packing Made Easy</>,
-    imageUrl: 'img/undraw_abstract_x68e.svg',
-    description: (
-      <>
-        You can config what resource to load, how to bundle it and how to embed it by telling the response object exactly what you need.
-      </>
-    ),
-  },
-  {
-    title: <>i18n Optimization</>,
-    imageUrl: 'img/undraw_around_the_world_v9nu.svg',
-    description: (
-      <>
-        django built-in internalization is used and extends to be supported by javascript components and server-side rendering.
+        `Bigpipe Response` Bundle And Render almost anything into the screen.
+
+
       </>
     ),
   }
@@ -109,21 +87,23 @@ function Home() {
               Get Started
             </Link>
 
-<span className={styles['index-ctas-github-button']}>
-                  <iframe
-                    src="https://ghbtns.com/github-btn.html?user=shacoshe&amp;repo=bigpipe-response&amp;type=star&amp;count=false&amp;size=large"
-                    frameBorder={0}
-                    scrolling={0}
-                    width={160}
-                    height={30}
-                    style={{marginLeft: '10px', marginTop: '5px'}}
-                    title="GitHub Stars"
-                  />
-                </span>
+            <span className={styles['index-ctas-github-button']}>
+              <iframe
+                src="https://ghbtns.com/github-btn.html?user=shacoshe&amp;repo=bigpipe-response&amp;type=star&amp;count=false&amp;size=large"
+                frameBorder={0}
+                scrolling={0}
+                width={160}
+                height={30}
+                style={{marginLeft: '10px', marginTop: '5px'}}
+                title="GitHub Stars"
+              />
+            </span>
+
           </div>
         </div>
       </header>
       <main>
+        <h1>The list of problems `bigpipe-response` meant to solve:</h1>
         {features && features.length && (
           <section className={styles.features}>
             <div className="container">

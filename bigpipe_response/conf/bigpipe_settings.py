@@ -65,29 +65,32 @@ class BigpipeSettings:
             processor_classes = get_class(conf_processors['class']).__bases__
             if BaseFileProcessor in processor_classes:
 
+                if not conf_processors.params.source_paths:
+                    raise InvalidConfiguration('processor `{}`. `source_paths` is missing'.format(conf_processors.params))
+
                 source_paths = OmegaConf.to_container(conf_processors.params.source_paths, resolve=True)
 
                 if source_paths and not isinstance(source_paths, list):
-                    raise InvalidConfiguration('processor "{}"  must be supply "source_paths " as list'.format(conf_processors.params))
+                    raise InvalidConfiguration('processor `{}` "source_paths " must as list'.format(conf_processors.params))
 
                 for sp_index in range(len(source_paths)):
                     source_base_path = source_paths[sp_index ]
                     if not os.path.exists(source_base_path):
-                        raise InvalidConfiguration('processor "{}" source_paths directory dose not exists. "{}"'.format(conf_processors.params, source_base_path))
+                        raise InvalidConfiguration('processor `{}` source_paths directory dose not exists. `{}`'.format(conf_processors.params, source_base_path))
 
                 if not conf_processors.params.source_ext or not isinstance(OmegaConf.to_container(conf_processors.params.source_ext, resolve=True), list):
-                    raise InvalidConfiguration('processors named "{}". source_ext musy be a populated list '.format(conf_processors.params.processor_name))
+                    raise InvalidConfiguration('processors named `{}`. source_ext musy be a populated list '.format(conf_processors.params.processor_name))
 
                 if not conf_processors.params.target_ext:
-                    raise InvalidConfiguration('processors named "{}". target_ext must be set')
+                    raise InvalidConfiguration('processors named `{}`. target_ext must be set')
 
             if RemoteJsFileProcessor in processor_classes or RemoteJsProcessor in processor_classes:
 
                 if not conf_processors.params.javascript_handler:
-                    raise InvalidConfiguration('processors named "{}". javascript_handler must be set.'.format(conf_processors.params.javascript_handler))
+                    raise InvalidConfiguration('processors named `{}`. javascript_handler must be set.'.format(conf_processors.params.javascript_handler))
 
                 if not conf_processors.params.javascript_handler.strip().lower().endswith('.js'):
-                    raise InvalidConfiguration('processors named "{}". javascript_handler must be with js extension.'.format(conf_processors.params.javascript_handler))
+                    raise InvalidConfiguration('processors named `{}`. javascript_handler must be with js extension.'.format(conf_processors.params.javascript_handler))
 
 
     @staticmethod

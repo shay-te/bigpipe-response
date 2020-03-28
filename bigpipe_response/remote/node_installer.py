@@ -17,7 +17,7 @@ class NodeInstaller(object):
         if not os.path.isdir(js_folder):
             os.makedirs(js_folder)
 
-        self.logger.info('Start NodeInstaller at folder "{}"'.format(self.js_folder))
+        self.logger.info('Start NodeInstaller at folder `{}`'.format(self.js_folder))
 
     @staticmethod
     def init(js_folder: str):

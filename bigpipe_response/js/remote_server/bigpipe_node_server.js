@@ -10,7 +10,13 @@ var processors = {}
 
 function renderError(error) { return new errors.InternalError(error); }
 function renderMessage(msg) { return {'message': msg}; }
-
+function handleError(next, error) {
+    console.error(error);
+    if (error instanceof ReferenceError) {
+        return next(new errors.BadRequestError(error.message));
+    }
+    return next(renderError(error.message));
+}
 
 function middlewareValidateRequestToken(req, res, next) {
     var headerToken = req.headers['authorization'].split(' ')[1];
@@ -26,19 +32,13 @@ var server_version = '1.0.0';
 
 const server = restify.createServer({name: server_name, version: server_version});
 server.use(restify.plugins.acceptParser(server.acceptable));
-server.use(restify.plugins.queryParser());
+server.use(restify.plugins.queryParser({ mapParams: true }));
 server.use(restify.plugins.bodyParser({ mapParams: true }));
 server.use(restify.plugins.acceptParser(server.acceptable));
 
 var bigpipeProcessorManager = new BigpipeProcessorManager();
 
-function handleError(next, error) {
-    console.error(error);
-    if (error instanceof ReferenceError) {
-        return next(new errors.BadRequestError(error.message));
-    }
-    return next(renderError(error.message));
-}
+
 server.post('/ding',
             middlewareValidateRequestToken,
             function (req, res, next) {

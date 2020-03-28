@@ -38,7 +38,7 @@ class RemoteClientServer(object):
         arr = resourse_str.rsplit('.', 2)
         resource_path = arr[0]
         resource_name = '{}.{}'.format(arr[1], arr[2])
-        self.logger.info('Loading javascript resource. resource_path: "{}", :"{}'.format(resource_path, resource_name))
+        self.logger.info('Loading javascript resource. resource_path: `{}`, resource_name: `{}`'.format(resource_path, resource_name))
 
         if not pkg_resources.resource_exists(resource_path, resource_name):
             raise ValueError('processor_js_resource must dose not exists')
@@ -99,7 +99,7 @@ class RemoteClientServer(object):
                     token = remote_js_server.start_server(port)
                     self.remote_js_server = remote_js_server
                     self.remote_js_client = RemoteJSClient("http://localhost:{}".format(port), token)
-                    self.logger.info('Remote Javascript Server started at port "{}".')
+                    self.logger.info('Remote Javascript Server started at port `{}`.')
                     self.logger.info('Registering processors to: remote js server.')
                     self.__send_register_processors()
                     return

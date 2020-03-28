@@ -45,7 +45,7 @@ class BaseFileProcessor(BaseProcessor):
             if os.path.isdir(source_path):
                 self.__scan_folder(source_path)
             else:
-                raise ValueError('processor "{}". the source_paths "{}" dose not exists'.format(self.processor_name, source_path))
+                raise ValueError('processor `{}`. the source_paths `{}` dose not exists'.format(self.processor_name, source_path))
 
     def on_start(self, js_remote_client: JSRemoteClient, is_production_mode: bool, output_dir: str):
         if not is_production_mode:
@@ -62,11 +62,11 @@ class BaseFileProcessor(BaseProcessor):
             raise ValueError('Component by source: [{}]. only string that contains letters, numbers, at, underscores and dashes are allowed'.format(source))
 
         if source not in self._component_to_file:
-            raise ValueError('render_source: "{}". is not registerd in processor "{}". The folder {} was scanned. but by name "{}" dose not exists. '.format(source, self.processor_name, self.source_paths, source))
+            raise ValueError('render_source: `{}`. is not registerd in processor `{}`. The folder {} was scanned. but by name `{}` dose not exists. '.format(source, self.processor_name, self.source_paths, source))
 
         input_file = self._component_to_file[source]
         if not os.path.isfile(input_file):
-            raise ValueError('File dose not exist. render_source "{}" is pointing to file "{}".'.format(source, input_file))
+            raise ValueError('File dose not exist. render_source `{}` is pointing to file `{}`.'.format(source, input_file))
 
     def process_source(self, source: str, options: dict = {}, include_dependencies: list = [], exclude_dependencies: list = []):
         input_file = self._component_to_file[source]
@@ -87,7 +87,7 @@ class BaseFileProcessor(BaseProcessor):
 
     # Clean output files
     def _clear(self):
-        self.logger.debug('File changes cleaning up all output files')
+        self.logger.info('File changes cleaning up all output files')
         files_not_deleted = []
         for delete_file in self._processed_files:
             if os.path.exists(delete_file):

@@ -46,8 +46,10 @@ class RemoteJsServer(object):
             sleep(0.6)  # wait for server to start
             poll = process.poll()
             if poll is None:
-                threading.Thread(target=self.__output_reader, args=('STDOUT', process.stdout,)).start()
-                threading.Thread(target=self.__output_reader, args=('STDERR', process.stderr,)).start()
+                if process.stdout:
+                    threading.Thread(target=self.__output_reader, args=('STDOUT', process.stdout ,)).start()
+                if process.stderr:
+                    threading.Thread(target=self.__output_reader, args=('STDERR', process.stderr,)).start()
                 self.process = process
                 self.__validate_server_is_running(port, token)
 
@@ -101,5 +103,8 @@ class RemoteJsServer(object):
         return session
 
     def __output_reader(self, name: str, stream):
-        for line in iter(stream.readline, b''):
-            self.logger.info('{}: {}'.format(name, line.strip().decode('utf-8')))
+        try:
+            for line in iter(stream.readline, b''):
+                self.logger.info('{}: {}'.format(name, line.strip().decode('utf-8')))
+        except BaseException as ex:
+            self.logger.error(ex)
