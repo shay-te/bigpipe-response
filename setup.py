@@ -1,8 +1,8 @@
+from pip._internal.network.session import PipSession
+from pip._internal.req import parse_requirements
+
 import bigpipe_response
 import setuptools
-
-from pip._internal.req import parse_requirements
-from pip._internal.download import PipSession
 
 install_reqs = parse_requirements('requirements.txt', session=PipSession)
 
@@ -21,7 +21,7 @@ setuptools.setup(
    author_email='shay.te@gmail.com',
    packages=setuptools.find_packages(),
    include_package_data=True,
-   install_requires=[str(ir.req) for ir in install_reqs],
+   install_requires=[str(ir.requirement) for ir in install_reqs],
    license="MIT",
    classifiers=[
       "Programming Language :: Python :: 3",
