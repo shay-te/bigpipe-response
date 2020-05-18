@@ -1,2 +1,2 @@
 # Version of the bigpipe-response package
-__version__ = "0.0.10a2"
+__version__ = "0.0.10a3"
