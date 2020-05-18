@@ -19,22 +19,9 @@ const features = [
     imageUrl: 'img/undraw_fast_loading_0lbh.svg',
     description: (
       <>
-        `Bigpipe Response` object will bundle code With minimum output bundle size.
-
-        The bundled code transformed using the build in <a>processors</a> that supports React/SCSS out of the box.
-
-        Processors are created by `configuration` `yaml` files And `code`.
-        It free more time to focus on the development of the application.
-      </>
-    ),
-  },
-  {
-    title: <>It Doesnt Override Anything</>,
-    imageUrl: 'img/undraw_online_media_62jb.svg',
-    description: (
-      <>
-        There's need to change the existing code structure.
-        It's another tool in the belt, A response object the do much more.
+Bigpipe Response bundle code automatically with minimum file size.
+<br></br><br></br>
+Bundled code is transformed using the build in <a>processors</a> (supoport React/SCSS out of the box).
       </>
     ),
   },
@@ -43,12 +30,35 @@ const features = [
     imageUrl: 'img/undraw_dev_productivity_umsq.svg',
     description: (
       <>
-        `Bigpipe Response` Bundle And Render almost anything into the screen.
-
+Bigpipe Response Bundle, Optimize And Render almost anything into the screen
+<br></br><br></br>
+It frees more time to focus on the development of the application.
 
       </>
     ),
-  }
+  },
+  {
+    title: <>It Doesnt Override Anything</>,
+    imageUrl: 'img/undraw_online_media_62jb.svg',
+    description: (
+      <>
+Bigpipe Response will find your code without changing the existing project structure.
+<br></br><br></br>
+It's another tool in the belt, A response Object the do more.
+      </>
+    ),
+  },
+  {
+    title: <>Expend capabilities with minimum effort</>,
+    imageUrl: 'img/undraw_abstract_x68e.svg',
+    description: (
+      <>
+Bigpipe Response is plug-able and can process almost anything
+<br></br><br></br>
+Custom Processors are created by `configuration` `YAML` files And `code`.
+      </>
+    ),
+  },
 ];
 
 function Feature({imageUrl, title, description}) {
@@ -103,7 +113,6 @@ function Home() {
         </div>
       </header>
       <main>
-        <h1>The list of problems `bigpipe-response` meant to solve:</h1>
         {features && features.length && (
           <section className={styles.features}>
             <div className="container">
