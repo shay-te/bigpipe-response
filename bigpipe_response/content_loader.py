@@ -162,13 +162,14 @@ class ContentLoader(object):
             if self.render_type is not BigpipeResponse.RenderType.TEMPLATE:
                 js_to_css_dependencies.append(self.render_source)
 
-            # add collect all javascript dependencies
+            # add collect all javascript dependencies.
             for key, sources in processor_name_to_sources.items():
                 for source in sources:
                     if source not in js_to_css_dependencies:
                         js_to_css_dependencies.append(source)
 
             # add javascript effected files
+            # For example `Button.jsx` will collect `Button.scss` if exists
             for js_effect_file in js_effected_files:
                 file_name = os.path.splitext(os.path.basename(js_effect_file))[0]
                 if file_name not in js_to_css_dependencies:

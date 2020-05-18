@@ -5,6 +5,7 @@ from hydra.utils import get_class
 from omegaconf import DictConfig, OmegaConf
 from bigpipe_response.bigpipe_render_options import BigpipeRenderOptions
 from bigpipe_response.conf.bigpipe_settings import BigpipeSettings
+from bigpipe_response.javascript_manager import JavascriptManager
 
 
 class Bigpipe(object):
@@ -36,11 +37,17 @@ class Bigpipe(object):
         )
 
         #
+        # Install js dependencies
+        #
+        self.logger.info("Installing javascript dependencies.")
+        javascript_manager = JavascriptManager(self.conf)
+        self.javascript_folder = javascript_manager.javascript_folder
+        #
         # processors manager
         #
         from bigpipe_response.processors_manager import ProcessorsManager
+        self.processors_manager = ProcessorsManager(self.conf, self.javascript_folder, processors)
 
-        self.processors_manager = ProcessorsManager(self.conf, processors)
         self.logger.info("Bigpipe Response Ready.")
 
     @staticmethod

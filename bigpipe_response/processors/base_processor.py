@@ -1,3 +1,4 @@
+import hashlib
 import os
 from abc import abstractmethod
 
@@ -19,6 +20,12 @@ class BaseProcessor(object):
         self.target_ext = target_ext
         self.is_production_mode = None
         self._output_file_to_effected_files = {}
+
+    #
+    # give subclasses the opportunity handle the dependencies. for example base_file_processor
+    #
+    def process_dependencies(self, include_dependencies: list, exclude_dependencies: list):
+        return include_dependencies, exclude_dependencies
 
     #
     # source: what is the source we are transforming into the output_file
@@ -75,10 +82,11 @@ class BaseProcessor(object):
     def run(self, source: str, options: dict = {}, include_dependencies: list = [], exclude_dependencies: list = []):
         self.validate_input(source)
 
-        processed_source, output_file = self.process_source(source, options, include_dependencies, exclude_dependencies)
+        in_dependencies, ex_dependencies = self.process_dependencies(include_dependencies, exclude_dependencies)
+        processed_source, output_file = self.process_source(source, options, in_dependencies, ex_dependencies)
 
         if output_file not in self._output_file_to_effected_files or not os.path.isfile(output_file):
-            effected_files = self.process_resource(processed_source, output_file, include_dependencies, exclude_dependencies, options)
+            effected_files = self.process_resource(processed_source, output_file, in_dependencies, ex_dependencies, options)
             self._output_file_to_effected_files[output_file] = effected_files
         else:
             effected_files = self._output_file_to_effected_files[output_file]
@@ -127,14 +135,14 @@ class BaseProcessor(object):
     #
     def build_output_file_path(self, input_file_name: str, options: dict = {}, include_dependencies: list = [], exclude_dependencies: list = []):
         # return os.path.join(self.output_dir, '{}.!{}!.{}-{}.{}'.format(input_file_name, self.processor_name, self.__dependencies_to_hash(include_dependencies), self.__dependencies_to_hash(exclude_dependencies), self.target_ext))
-
+        include_dependencies_hash = self._dependencies_to_hash(include_dependencies)
         output_file_prefix = ''
         if options and 'output_file_prefix' in options:
             output_file_prefix = options['output_file_prefix']
-        return os.path.join(self.output_dir, '{}{}.!{}!.{}'.format(output_file_prefix, input_file_name, self.processor_name, self.target_ext))
+        return os.path.join(self.output_dir, '{}{}.!{}!.{}.{}'.format(output_file_prefix, input_file_name, self.processor_name, include_dependencies_hash, self.target_ext))
 
     #
-    # in the future bigpipe will make sure that pagelet will not use the same dependencies.
+    # in the future bigpipe will make sure that pagelet will not use the same dependencies.  NOT YET SUPPORTED
     #
-    # def __dependencies_to_hash(self, dependencies_list: list):
-    #     return hashlib.blake2b(str(dependencies_list).encode(), digest_size=5).hexdigest() if dependencies_list else '_' NOT YET SUPPORTED
+    def _dependencies_to_hash(self, dependencies_list: list):
+        return hashlib.blake2b(str(sorted(dependencies_list)).encode(), digest_size=5).hexdigest() if dependencies_list else '_'

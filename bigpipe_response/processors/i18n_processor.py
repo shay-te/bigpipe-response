@@ -23,10 +23,10 @@ class I18nProcessor(BaseProcessor):
         if 'language' not in options or not options['language']: raise ValueError('I18nProcessor expect options to contain \'language\' ')
 
         translation = DjangoTranslation(options['language'])
-        new_pattern = '|'.join(['({})'.format(pattern) for pattern in options['i18n_dependencies']])
+        new_pattern = '|'.join(['({})'.format(pattern) for pattern in options['i18n_dependencies'] if pattern])
         result = {}
         for key, value in translation._catalog.items():
-            if isinstance(key, str) and re.match(new_pattern, key):
+            if key and isinstance(key, str) and re.match(new_pattern, key):
                 result[key] = value
 
         with open(output_file, 'w+') as fp:

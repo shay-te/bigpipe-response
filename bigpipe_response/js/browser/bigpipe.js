@@ -1,11 +1,11 @@
 window.module = {exports: 0};
+window.require = function(){};
 
-window.renderI18n = function(i18n) {
-    if(typeof django == "object" && typeof django.catalog == "object") {
-        for(var key in i18n) { django.catalog[key] = i18n[key]; }
-    } else {
-        console.error('django jsi18n was never loaded')
+window.i18n = function(key) {
+    if(typeof django == "object" && typeof django.catalog == "object" && django.catalog.hasOwnProperty("key")) {
+        return django.catalog[key];
     }
+    return key;
 }
 
 var _isArr = function(o) {return o && o.constructor === Array;};
@@ -16,7 +16,13 @@ window.renderPagelet = function(p) {
             console.error("ERROR: pagelet fill, id:" + p.html + " Not exist");
             return;
         }
-        if(p.i18n) { renderI18n(p.i18n); }
+        if(p.i18n) {
+            if(typeof django == "object" && typeof django.catalog == "object") {
+                for(var key in p.i18n) { django.catalog[key] = p.i18n[key]; }
+            } else {
+                console.error('django jsi18n was never loaded')
+            }
+        }
         if(p.html) {
             el.innerHTML = p.html;
         }

@@ -1,6 +1,11 @@
+import logging
 import os
 import sass
+
 from bigpipe_response.processors.base_file_processor import BaseFileProcessor
+
+
+logger = logging.getLogger(__name__)
 
 
 class CSSProcessor(BaseFileProcessor):
@@ -23,26 +28,40 @@ class CSSProcessor(BaseFileProcessor):
         if not self.is_production_mode:  # on development mode files may change
             self.include_paths = self.__generate_include_paths()
 
+        # Include the main file
         import_full_paths = []
         if not self.is_component_virtual(os.path.splitext(os.path.basename(input_file))[0]):
             import_full_paths.append(input_file)
+
         import_paths = []
         for dependency in include_dependencies:
-            component_file = self._component_to_file[dependency]
-            import_full_paths.append(component_file)
-            import_paths.append(os.path.dirname(component_file))
+            if dependency in self._component_to_file:
+                component_file = self._component_to_file[dependency]
+                import_full_paths.append(component_file)
+                import_paths.append(os.path.dirname(component_file))
+            else:
+                logger.warning('dependency `{}` is  not registered'.format(dependency))
 
         source_list = []
         for full_path in list(set(import_full_paths)):
             source_list.append('@import \'{}\';'.format(full_path.replace('\\', '/')))  # replace case of windows
-        compiled = sass.compile(string=''.join(source_list),
-                                include_paths=import_paths + self.include_paths,
-                                importers=((0, importer_returning_one_argument,),),
-                                output_style='compressed' if self.is_production_mode else 'expanded')
 
-        fp = open(output_file, "w", encoding='utf-8')
-        fp.write(compiled)
-        fp.close()
+        from bigpipe_response.bigpipe import Bigpipe
+        include_paths = import_paths + self.include_paths + [os.path.join(Bigpipe.get().javascript_folder, 'node_modules')]
+
+        include_paths.sort()
+        source_list.sort()
+        if source_list or include_paths:
+            compiled = sass.compile(string=''.join(source_list),
+                                    include_paths=include_paths,
+                                    importers=((0, importer_returning_one_argument,),),
+                                    output_style='compressed' if self.is_production_mode else 'expanded')
+
+            fp = open(output_file, "w", encoding='utf-8')
+            fp.write(compiled)
+            fp.close()
+        else:
+            logger.warning('nothing to compile')
 
         return effected_files
 

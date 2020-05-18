@@ -30,9 +30,6 @@ class NodeInstaller(object):
             raise NameError('NodeInstaller not initialized')
         return NodeInstaller.__instance
 
-    def get_javascript_folder(self):
-        return self.js_folder
-
     def install_javascript_dependencies(self, packages: list, local_packages: dict):
         self.logger.info('NodeInstaller.install_javascript_dependencies {}. '.format(list(local_packages.values()) + packages))
         node_modules_dir = os.path.join(self.js_folder, 'node_modules')
@@ -69,7 +66,11 @@ class NodeInstaller(object):
         exitcode, out, err = self.__execute_command(js_folder, command_install_dev)
         if exitcode != 0:
             raise ValueError('enable to install [{}], exit with error [{}]'.format(command_install_dev, err))
-        self.logger.info('NodeInstaller output:\n{}\nerror:'.format(out, err))
+
+        self.logger.info('NodeInstaller output:\n{}'.format(out))
+        if err:
+            self.logger.info('NodeInstaller error:\n{}'.format(err))
+
 
     def __execute_command(self, js_folder, command):
         proc = Popen(command, stdout=PIPE, stderr=PIPE, shell=True, cwd=js_folder)

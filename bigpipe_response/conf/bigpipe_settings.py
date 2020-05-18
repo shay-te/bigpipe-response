@@ -74,7 +74,7 @@ class BigpipeSettings:
                     raise InvalidConfiguration('processor `{}` "source_paths " must as list'.format(conf_processors.params))
 
                 for sp_index in range(len(source_paths)):
-                    source_base_path = source_paths[sp_index ]
+                    source_base_path = source_paths[sp_index]
                     if not os.path.exists(source_base_path):
                         raise InvalidConfiguration('processor `{}` source_paths directory dose not exists. `{}`'.format(conf_processors.params, source_base_path))
 

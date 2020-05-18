@@ -4,6 +4,7 @@ var path = require('path');
 var fs = require('fs');
 
 var uglify = require('rollup-plugin-uglify').uglify;
+var resolve = require('@rollup/plugin-node-resolve');
 
 function includeFiles (include, exclude) {
     const emptyFile = 'export default {}';
@@ -18,7 +19,6 @@ function includeFiles (include, exclude) {
     }
     return {
         name: 'include-files',
-//        resolveId ( source, importer) { return null; },
         load ( id ) {
             if(!loadCalled) {
                 loadCalled = true;
@@ -31,7 +31,7 @@ function includeFiles (include, exclude) {
 }
 
 async function build(isProduction, input_file_path, output_file_path, include, exclude, extra_plugins) {
-    var plugins = [];
+    var plugins = [resolve()];
     var input = input_file_path;
 
     plugins.push(includeFiles(include, exclude))

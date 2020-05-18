@@ -4,7 +4,6 @@ import os
 from hydra.utils import instantiate
 from omegaconf import DictConfig
 
-from bigpipe_response.javascript_manager import JavascriptManager
 from bigpipe_response.remote.js_processor_client import JSRemoteClient
 from bigpipe_response.remote.remote_client_server import RemoteClientServer
 
@@ -15,7 +14,7 @@ from bigpipe_response.processors.base_processor import BaseProcessor
 
 class ProcessorsManager(object):
 
-    def __init__(self, config: DictConfig, processors: list = []):
+    def __init__(self, config: DictConfig, javascript_folder: str, processors: list = []):
         self.conf = config
         self.logger = logging.getLogger(self.__class__.__name__)
         #
@@ -29,18 +28,14 @@ class ProcessorsManager(object):
         if not os.path.exists(self.virtual_source_dir):
             os.makedirs(self.virtual_source_dir)
 
-        #
-        # Install js dependencies
-        #
-        self.logger.info("Installing javascript dependencies.")
-        javascript_manager = JavascriptManager(self.conf)
+
 
         #
         # Remote javascript server initialize.
         #
         self.logger.info("Initialize javascript server.")
 
-        self.remote_client_server = RemoteClientServer(javascript_manager.javascript_folder,
+        self.remote_client_server = RemoteClientServer(javascript_folder,
                                                        self.conf.is_production_mode,
                                                        self.conf.remote.port_start,
                                                        self.conf.remote.port_count)

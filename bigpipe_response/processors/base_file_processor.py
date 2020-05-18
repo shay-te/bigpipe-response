@@ -11,7 +11,7 @@ from bigpipe_response.decorators import Debounce
 from bigpipe_response.processors.base_processor import BaseProcessor
 
 
-class BaseFileProcessor(BaseProcessor):
+class BaseFileProcessor(BaseProcessor, FileSystemEventHandler):
 
     # example values: source_ext: scss, target_ext: css
     def __init__(self, processor_name: str, source_paths: list, source_ext: list, target_ext: str, exclude_dir=None):
@@ -43,7 +43,7 @@ class BaseFileProcessor(BaseProcessor):
         for i in range(len(self.source_paths)):  # Omegaconf resolvers will be  will translated this way
             source_path = self.source_paths[i]
             if os.path.isdir(source_path):
-                self.__scan_folder(source_path)
+                self.__register_folder(source_path)
             else:
                 raise ValueError('processor `{}`. the source_paths `{}` dose not exists'.format(self.processor_name, source_path))
 
@@ -52,7 +52,7 @@ class BaseFileProcessor(BaseProcessor):
             self.observer = Observer()
             for i in range(len(self.source_paths)):  # Omegaconf resolvers will be  will translated this way
                 source_path = self.source_paths[i]
-                self.observer.schedule(SourceChangesHandler(self), path=source_path, recursive=True)
+                self.observer.schedule(self, path=source_path, recursive=True)
             self.observer.start()
 
     def validate_input(self, source: str):
@@ -67,6 +67,10 @@ class BaseFileProcessor(BaseProcessor):
         input_file = self._component_to_file[source]
         if not os.path.isfile(input_file):
             raise ValueError('File dose not exist. render_source `{}` is pointing to file `{}`.'.format(source, input_file))
+
+    def process_dependencies(self, include_dependencies: list, exclude_dependencies: list):
+        filtered_in = [dependency for dependency in include_dependencies if not self.is_component_virtual(dependency)]
+        return filtered_in, exclude_dependencies
 
     def process_source(self, source: str, options: dict = {}, include_dependencies: list = [], exclude_dependencies: list = []):
         input_file = self._component_to_file[source]
@@ -101,22 +105,45 @@ class BaseFileProcessor(BaseProcessor):
 
         self._processed_files = files_not_deleted
 
-    def __scan_folder(self, source_path):
+    def __scan_folder(self, source_path, register=True):
+        effected = False
         for root, dirnames, filenames in os.walk(source_path):
             for file in filenames:
                 if self.exclude_dir and self.exclude_dir in root:
                     continue
 
-                file_name, file_extension = os.path.splitext(file)
-                if file_extension and file_extension[0] is '.':
-                    file_extension = file_extension[1::]
+                if register:
+                    local_effected = self.__register_file(root, file)
+                else:
+                    local_effected = self.__unregister_file(root, file)
+                if local_effected:
+                    effected = True
+        return effected
 
-                if file_extension in self.source_ext:
-                    if file_name not in self._component_to_file:
-                        file_path = os.path.join(root, file)
-                        self._component_to_file[file_name] = file_path
-                    else:
-                        self.logger.error('ERROR: Bigpipe SourceWatcher. {} already registered, will use first file: {}'.format(file_name, self._component_to_file[file_name]))
+    def __register_folder(self, source_path):
+        self.__scan_folder(source_path, True)
+
+    def __unregister_folder(self, source_path):
+        self.__scan_folder(source_path, False)
+
+    def __register_file(self, folder, file):
+        file_name, file_extension = os.path.splitext(file)
+        if file_extension and file_extension[0] is '.':
+            file_extension = file_extension[1::]
+
+        if file_extension in self.source_ext:
+            if file_name not in self._component_to_file:
+                self._component_to_file[file_name] = os.path.join(folder, file)
+                return True
+            else:
+                self.logger.error('ERROR: Bigpipe SourceWatcher. {} already registered, will use first file: {}'.format(file_name,
+                                                                                                                        self._component_to_file[file_name]))
+
+    def __unregister_file(self, folder, file):
+        file_name, file_extension = os.path.splitext(file)
+        if file_name in self._component_to_file:
+            return True
+            del self._component_to_file[file_name]
 
     # BaseProcessor files.
     def on_shutdown(self):
@@ -141,11 +168,35 @@ class BaseFileProcessor(BaseProcessor):
     def render_resource(self, input_file, context, i18n):
         pass
 
-
-class SourceChangesHandler(FileSystemEventHandler):
-    def __init__(self, base_processor):
-        self.base_processor = base_processor
+    #
+    #
+    # FileSystemEventHandler
+    #
+    #
 
     @Debounce(0.35)
     def on_any_event(self, event):
-        self.base_processor._clear()
+        self._clear()
+
+    @Debounce(0.35)
+    def on_created(self, event):
+        if event.is_directory:
+            if self.__register_folder(event.src_path):
+                self.logger.info('Registering new folder `{}`'.format(event.src_path))
+        else:
+            folder = os.path.dirname(event.src_path)
+            file = os.path.basename(event.src_path)
+            if self.__register_file(folder, file):
+                self.logger.info('Registering new file `{}`'.format(event.src_path))
+
+    @Debounce(0.35)
+    def on_deleted(self, event):
+        if event.is_directory:
+            if self.__unregister_folder(event.src_path):
+                self.logger.info('Unregistering new folder `{}`'.format(event.src_path))
+
+        else:
+            folder = os.path.dirname(event.src_path)
+            file = os.path.basename(event.src_path)
+            if self.__unregister_file(folder, file):
+                self.logger.info('Unregistering new file `{}`'.format(event.src_path))
