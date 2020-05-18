@@ -76,6 +76,7 @@ function Feature({imageUrl, title, description}) {
   );
 }
 
+var subtitleStyle = {textTransform: "uppercase", letterSpacing: '8.5px', fontSize: '20px', paddingLeft: '10px', borderTop: '2px solid white', paddingTop: '12px'}
 function Home() {
   const context = useDocusaurusContext();
   const {siteConfig = {}} = context;
@@ -85,8 +86,10 @@ function Home() {
       description="Bigpipe Response <head />">
       <header className={classnames('hero hero--primary', styles.heroBanner)}>
         <div className="container">
-          <h1 className="hero__title">{siteConfig.title}</h1>
-          <p className="hero__subtitle">{siteConfig.tagline}</p>
+          <h1 className="hero__title" style={{textTransform: "uppercase"}}>{siteConfig.title}</h1>
+          <p className="hero__subtitle" style={subtitleStyle}>
+            {siteConfig.tagline}
+           </p>
           <div className={styles.buttons}>
             <Link
               className={classnames(
