@@ -49,7 +49,7 @@ It's another tool in the belt, A response Object the do more.
     ),
   },
   {
-    title: <>Expend capabilities with minimum effort</>,
+    title: <>Maximum Capabilities With Minimum Effort</>,
     imageUrl: 'img/undraw_abstract_x68e.svg',
     description: (
       <>
