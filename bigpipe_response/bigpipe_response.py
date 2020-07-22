@@ -1,10 +1,11 @@
 import enum
 import json
+import logging
 import queue
 import sys
 import threading
 import traceback
-import logging
+
 from django.http import StreamingHttpResponse
 
 from bigpipe_response.bigpipe import Bigpipe
@@ -52,16 +53,44 @@ class BigpipeResponse(StreamingHttpResponse):
             for entry_content in self.__yield_content(content_result):
                 yield entry_content
 
+            dependencies = {}
             que = queue.Queue()
             paglent_count = len(self.pagelets)
             for pagelet in self.pagelets:
                 last_pagelet_target = pagelet.target
+                if pagelet.depends_on:
+                    dependencies[pagelet.target] = pagelet.depends_on
                 threading.Thread(target=self.__process_paglet, args=(pagelet, que), daemon=True).start()
 
+            # Validate dependencies
+            self.__validate_deendencies(dependencies)
+
+            yield_paglets = []
+            yield_later = {}
             for _ in range(paglent_count):
-                pageelet_response = que.get()
-                if isinstance(pageelet_response, BaseException): raise pageelet_response
-                yield pageelet_response
+                pagelet_response = que.get()
+                if isinstance(pagelet_response, BaseException): raise pagelet_response
+
+                # Handle depends_on
+                # When depends_on flag is set, the result will be cached and pushed only after the dependency is loaded
+                target = pagelet_response['target']
+                if target in dependencies:
+                    dependent_target = dependencies.get(target)
+                    if dependent_target not in yield_paglets:
+                        yield_later.setdefault(dependent_target, []).append(pagelet_response)
+                        continue
+
+                yield_paglets.append(target)
+                yield self._render_paglet_content(pagelet_response)
+
+                if target in yield_later:
+                    for yield_pagelet_response in yield_later.get(target):
+                        yield self._render_paglet_content(yield_pagelet_response)
+                    del yield_later[target]
+
+            for target, yield_pagelet_response in yield_later.items():
+                yield self._render_paglet_content(yield_pagelet_response)
+                del yield_later[target]
 
         except BaseException as ex:
             self.logger.error("Error handling bigpipe response", exc_info=sys.exc_info())
@@ -72,7 +101,7 @@ class BigpipeResponse(StreamingHttpResponse):
                 i18n = {}
                 content_result_error = ContentResult(content, js, css, i18n, [], [], [], [])
                 if last_pagelet_target:
-                    yield self.__get_pagelet_content(last_pagelet_target, content_result_error)
+                    yield self._render_paglet_content(self.__get_pagelet_content(last_pagelet_target, content_result_error))
                 else:
                     for entry_content in self.__yield_content(content_result_error):
                         yield entry_content
@@ -85,7 +114,6 @@ class BigpipeResponse(StreamingHttpResponse):
         try:
             pagelet_response = pagelet.render()
             if isinstance(pagelet_response, BigpipeResponse):
-
                 content_result = pagelet_response.content_loader.load_content(pagelet.target, self.processed_js_files, self.processed_css_files)
                 self.processed_js_files = self.processed_js_files + content_result.js_effected_files
                 self.processed_css_files = self.processed_css_files + content_result.css_effected_files
@@ -125,11 +153,17 @@ class BigpipeResponse(StreamingHttpResponse):
             result['css_links'] = content_result.css_links
         if Bigpipe.get().config.is_production_mode:
             result['remove'] = True
+        return result
 
+    def _render_paglet_content(self, pagelet_content):
         return """
             <script id='{}'>
                 renderPagelet({})
             </script>
-        """.format('script_{}'.format(paglet_target), json.dumps(result))
+        """.format('script_{}'.format(pagelet_content['target']), json.dumps(pagelet_content))
 
+    def __validate_deendencies(self, dependencies: dict):
+        for key, value in dependencies.items():
+            if value in dependencies:
+                raise ValueError('Dependencies lock. dependency `{}` already defined'.format(value))
 

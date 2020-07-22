@@ -3,8 +3,10 @@ const rollup = require('rollup');
 var path = require('path');
 var fs = require('fs');
 
-var uglify = require('rollup-plugin-uglify').uglify;
+var terser = require('rollup-plugin-terser').terser;
 var resolve = require('@rollup/plugin-node-resolve');
+var commonjs = require('@rollup/plugin-commonjs');
+var injectProcessEnv = require('rollup-plugin-inject-process-env');
 
 function includeFiles (include, exclude) {
     const emptyFile = 'export default {}';
@@ -26,12 +28,15 @@ function includeFiles (include, exclude) {
             }
             return null;
         }
-
     };
 }
 
 async function build(isProduction, input_file_path, output_file_path, include, exclude, extra_plugins) {
-    var plugins = [resolve()];
+    var plugins = [injectProcessEnv({NODE_ENV: isProduction ? 'production' : 'development'}),
+                   resolve({browser: true, jsnext: true}),
+                   commonjs()];
+
+
     var input = input_file_path;
 
     plugins.push(includeFiles(include, exclude))
@@ -40,14 +45,21 @@ async function build(isProduction, input_file_path, output_file_path, include, e
         plugins = plugins.concat(extra_plugins);
     }
 
-
     if(isProduction) {
-        plugins.push(uglify())
+        plugins.push(terser({
+                                ecma: 5,
+                                mangle : false,
+                                compress: {
+                                    reduce_vars: false,
+                                    unused: false
+                                }
+                            }));
     }
 
     var inputOptions = {
         input: input_file_path,
-        plugins: plugins
+        plugins: plugins,
+        context: 'window'
     }
 
     var outputOptions = {

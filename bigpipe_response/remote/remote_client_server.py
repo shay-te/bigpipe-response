@@ -1,11 +1,11 @@
 import logging
+import socket
 import traceback
 
 import pkg_resources
 
 from bigpipe_response.remote.remote_js_client import RemoteJSClient
 from bigpipe_response.remote.remote_js_server import RemoteJsServer
-import socket
 
 
 class RemoteClientServer(object):
@@ -15,12 +15,14 @@ class RemoteClientServer(object):
         is_production: bool,
         port_start: int,
         port_count: int,
+        timeout: int
     ):
         self.js_folder = js_folder
         self.is_production = is_production
         self._processors = {}
         self.port_start = port_start
         self.port_end = port_start + port_count
+        self.timeout = timeout
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def register_processor_handler(self, processor_name, resource_str):
@@ -98,7 +100,7 @@ class RemoteClientServer(object):
                 try:
                     token = remote_js_server.start_server(port)
                     self.remote_js_server = remote_js_server
-                    self.remote_js_client = RemoteJSClient("http://localhost:{}".format(port), token)
+                    self.remote_js_client = RemoteJSClient("http://localhost:{}".format(port), token, self.timeout)
                     self.logger.info('Remote Javascript Server started at port `{}`.')
                     self.logger.info('Registering processors to: remote js server.')
                     self.__send_register_processors()

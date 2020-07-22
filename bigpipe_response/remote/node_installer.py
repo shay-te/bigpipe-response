@@ -3,7 +3,7 @@ import logging
 import os
 import threading
 import time
-from subprocess import Popen, STDOUT, PIPE
+from subprocess import Popen, PIPE
 
 
 class NodeInstaller(object):
@@ -36,7 +36,7 @@ class NodeInstaller(object):
         if not os.path.isdir(node_modules_dir):
             self.logger.info('WAIT!!. patience please. First run takes a while. "node_modules" folder missing installing all dependencies')
             if local_packages.values():
-                self.__install_packages(self.js_folder, local_packages.values())
+                self.__install_packages(self.js_folder, list(local_packages.values()))
             if packages:
                 self.__install_packages(self.js_folder, packages)
         else:

@@ -76,7 +76,8 @@ function Feature({imageUrl, title, description}) {
   );
 }
 
-var subtitleStyle = {textTransform: "uppercase", letterSpacing: '8.5px', fontSize: '20px', paddingLeft: '10px', borderTop: '2px solid white', paddingTop: '12px'}
+var subtitleStyle = {textTransform: "uppercase", letterSpacing: '8.5px', fontSize: '20px', paddingLeft: '10px', borderTop: '2px solid white', paddingTop: '12px', paddingBottom: '10px'};
+
 function Home() {
   const context = useDocusaurusContext();
   const {siteConfig = {}} = context;

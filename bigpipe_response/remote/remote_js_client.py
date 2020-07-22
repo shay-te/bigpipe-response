@@ -1,15 +1,16 @@
 import json
 import logging
+import urllib.parse
 
 import requests
-import urllib.parse
 
 
 class RemoteJSClient(object):
 
-    def __init__(self, url: str, token: str):
+    def __init__(self, url: str, token: str, timeout: int):
         self.session = requests.Session()
         self.url = url
+        self.timeout = timeout
         self.headers = {'Authorization': 'Basic {}'.format(token)}
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -30,7 +31,7 @@ class RemoteJSClient(object):
 
     def __post(self, url_relative: str, data: dict, files: dict = None):
         url_absolute = urllib.parse.urljoin(self.url, url_relative)
-        response = self.session.post(url_absolute, json=data, headers=self.headers, timeout=10, files=files)
+        response = self.session.post(url_absolute, json=data, headers=self.headers, timeout=self.timeout, files=files)
         response_json = json.loads(response.content.decode('utf-8'))
         try:
             if response.status_code == 200:

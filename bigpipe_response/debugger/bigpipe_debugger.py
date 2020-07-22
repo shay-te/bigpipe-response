@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 from ansi2html import Ansi2HTMLConverter
+
 ansi_convert = Ansi2HTMLConverter(inline=True)
 
 current_dir = os.path.dirname(os.path.abspath(__file__))

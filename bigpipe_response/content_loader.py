@@ -1,15 +1,15 @@
 import json
 import os
 
-from bigpipe_response.bigpipe_response import BigpipeResponse
 from django.conf import settings
-from bigpipe_response.bigpipe import Bigpipe
-from bigpipe_response.bigpipe_render_options import BigpipeRenderOptions
-from bigpipe_response.content_result import ContentResult
-from bigpipe_response.dependencies_marshalling import DependenciesMarshalling
-
 from django.template import loader
 from django.utils import translation
+
+from bigpipe_response.bigpipe import Bigpipe
+from bigpipe_response.bigpipe_render_options import BigpipeRenderOptions
+from bigpipe_response.bigpipe_response import BigpipeResponse
+from bigpipe_response.content_result import ContentResult
+from bigpipe_response.dependencies_marshalling import DependenciesMarshalling
 
 
 class ContentLoader(object):
@@ -244,7 +244,7 @@ class ContentLoader(object):
         return {**context, **links}
 
     def __get_file_content(self, file_path):
-        fp = open(file_path, "r")
+        fp = open(file_path, "r", encoding='utf8', errors='ignore')
         content = fp.read()
         fp.close()
         return content

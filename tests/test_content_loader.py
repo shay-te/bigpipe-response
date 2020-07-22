@@ -2,12 +2,9 @@ import os
 import unittest
 
 from bigpipe_response.bigpipe import Bigpipe
-
-
 from bigpipe_response.bigpipe_response import BigpipeResponse
 from bigpipe_response.content_loader import ContentLoader
 from bigpipe_response.helpers import to_include
-
 from tests.test_utils import TestUtils
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.data.settings')

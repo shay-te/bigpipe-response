@@ -1,9 +1,7 @@
 import unittest
 
-from tests.test_utils import TestUtils
-
 from bigpipe_response.dependencies_marshalling import DependenciesMarshalling
-
+from tests.test_utils import TestUtils
 
 TestUtils.setup_logger()
 

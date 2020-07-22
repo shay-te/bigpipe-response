@@ -4,11 +4,12 @@ import re
 from abc import abstractmethod
 from collections import Iterable
 
-from bigpipe_response.remote.js_processor_client import JSRemoteClient
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
+
 from bigpipe_response.decorators import Debounce
 from bigpipe_response.processors.base_processor import BaseProcessor
+from bigpipe_response.remote.js_processor_client import JSRemoteClient
 
 
 class BaseFileProcessor(BaseProcessor, FileSystemEventHandler):
@@ -128,7 +129,7 @@ class BaseFileProcessor(BaseProcessor, FileSystemEventHandler):
 
     def __register_file(self, folder, file):
         file_name, file_extension = os.path.splitext(file)
-        if file_extension and file_extension[0] is '.':
+        if file_extension and file_extension[0] == '.':
             file_extension = file_extension[1::]
 
         if file_extension in self.source_ext:

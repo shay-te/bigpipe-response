@@ -2,9 +2,9 @@ import logging
 import os
 import sys
 
-from hydra._internal.hydra import Hydra, GlobalHydra
-from omegaconf import OmegaConf
+from hydra._internal.hydra import GlobalHydra
 from hydra.experimental import initialize, compose
+from omegaconf import OmegaConf
 
 
 class TestUtils(object):

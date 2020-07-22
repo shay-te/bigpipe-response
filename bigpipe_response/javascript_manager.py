@@ -3,10 +3,10 @@ import os
 import tempfile
 from shutil import copyfile
 
+from django.views.i18n import JavaScriptCatalog, get_formats
 from omegaconf import OmegaConf
 
 from bigpipe_response.remote.node_installer import NodeInstaller
-from django.views.i18n import JavaScriptCatalog, get_formats
 
 
 class JavascriptManager(object):

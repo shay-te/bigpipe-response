@@ -16,8 +16,8 @@ class WebpackModuleProcessor extends BaseProcessor {
         for(var i in includeDependencies) {
             let includeDependency = includeDependencies[i].trim();
             let includeDependencyVariable = undefined;
-            if(includeDependency.indexOf('.') > 0) {
-                let includeDependencyWithVariable = includeDependency.split('.');
+            if(includeDependency.indexOf('|') > 0) {
+                let includeDependencyWithVariable = includeDependency.split('|');
                 includeDependency = includeDependencyWithVariable[0];
                 includeDependencyVariable = includeDependencyWithVariable[1];
             }

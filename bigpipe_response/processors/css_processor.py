@@ -1,9 +1,9 @@
 import logging
 import os
+
 import sass
 
 from bigpipe_response.processors.base_file_processor import BaseFileProcessor
-
 
 logger = logging.getLogger(__name__)
 

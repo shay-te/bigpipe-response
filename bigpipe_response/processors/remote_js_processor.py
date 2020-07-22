@@ -1,5 +1,5 @@
-from bigpipe_response.remote.js_processor_client import JSRemoteClient
 from bigpipe_response.processors.base_processor import BaseProcessor
+from bigpipe_response.remote.js_processor_client import JSRemoteClient
 
 
 class RemoteJsProcessor(BaseProcessor):

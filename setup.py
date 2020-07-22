@@ -1,8 +1,8 @@
+import setuptools
 from pip._internal.network.session import PipSession
 from pip._internal.req import parse_requirements
 
 import bigpipe_response
-import setuptools
 
 install_reqs = parse_requirements('requirements.txt', session=PipSession)
 
@@ -15,7 +15,7 @@ setuptools.setup(
    description='Bigpipe, Pipelining web pages for high performance, django response object',
    long_description=long_description,
    long_description_content_type="text/markdown",
-   url="https://github.com/shacoshe/bigpipe-response",
+   url="https://github.com/shay-te/bigpipe-response",
    setup_requires=['wheel'],
    author='Shay Tessler',
    author_email='shay.te@gmail.com',

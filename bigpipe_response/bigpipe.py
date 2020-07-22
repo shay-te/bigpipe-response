@@ -3,6 +3,7 @@ import os
 
 from hydra.utils import get_class
 from omegaconf import DictConfig, OmegaConf
+
 from bigpipe_response.bigpipe_render_options import BigpipeRenderOptions
 from bigpipe_response.conf.bigpipe_settings import BigpipeSettings
 from bigpipe_response.javascript_manager import JavascriptManager
@@ -20,8 +21,22 @@ class Bigpipe(object):
         #
         default_config = OmegaConf.load(os.path.join(os.path.dirname(__file__), 'conf', 'bigpipe.yaml'))
         self.conf = OmegaConf.merge(default_config, config)
-        BigpipeSettings.validate_settings(self.conf)
 
+        #
+        # Install js dependencies
+        #
+        self.logger.info("Installing javascript dependencies.")
+
+        BigpipeSettings.validate_rendered_output_path(self.conf)
+
+        javascript_manager = JavascriptManager(self.conf)
+        self.javascript_folder = javascript_manager.javascript_folder
+
+        #
+        # Validate config. this is after installing javascript.
+        # since processors input folders could be inside the node module folder
+        #
+        BigpipeSettings.validate_settings(self.conf)
 
         #
         # Set render default options
@@ -36,12 +51,7 @@ class Bigpipe(object):
             css_complete_dependencies_by_js=self.conf.css.complete_dependencies_by_js,
         )
 
-        #
-        # Install js dependencies
-        #
-        self.logger.info("Installing javascript dependencies.")
-        javascript_manager = JavascriptManager(self.conf)
-        self.javascript_folder = javascript_manager.javascript_folder
+
         #
         # processors manager
         #

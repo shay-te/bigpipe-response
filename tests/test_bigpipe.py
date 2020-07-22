@@ -1,13 +1,13 @@
 import os
 import unittest
 
-from bigpipe_response.pagelet import Pagelet
 from django.http import HttpResponse, HttpRequest
 from django.utils.translation import activate
 from django.utils.translation.trans_real import DjangoTranslation
 
 from bigpipe_response.bigpipe import Bigpipe
 from bigpipe_response.bigpipe_response import BigpipeResponse
+from bigpipe_response.pagelet import Pagelet
 from tests.test_utils import TestUtils
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.data.settings')

@@ -9,6 +9,7 @@ bigpipe:
   remote:
     port_start: 7480
     port_count: 10
+    timeout: 20
     extra_node_packages: []
 
   javascript:

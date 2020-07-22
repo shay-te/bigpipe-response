@@ -1,5 +1,6 @@
-import re
 import json
+import re
+
 from django.utils.translation.trans_real import DjangoTranslation
 
 from bigpipe_response.processors.base_processor import BaseProcessor

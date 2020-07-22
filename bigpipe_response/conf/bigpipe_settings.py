@@ -1,8 +1,6 @@
 import os
 
 from hydra.utils import get_class
-
-from bigpipe_response.processors.css_processor import CSSProcessor
 from omegaconf import OmegaConf
 
 from bigpipe_response.exceptions import InvalidConfiguration
@@ -24,9 +22,13 @@ class BigpipeSettings:
             raise InvalidConfiguration('{}} must be set to a valid folder name. no spaces, dots are allowed. suggestions: {}'.format(property_name, fixed_folder_name))
 
     @staticmethod
-    def validate_settings(config):
+    def validate_rendered_output_path(config):
         if not config.rendered_output_path or not os.path.isdir(config.rendered_output_path):
             raise InvalidConfiguration('rendered_output_path need to be a an exists path')
+
+    @staticmethod
+    def validate_settings(config):
+        BigpipeSettings.validate_rendered_output_path(config)
 
         BigpipeSettings.validate_folder_name(config.rendered_output_container, 'rendered_output_container')
 

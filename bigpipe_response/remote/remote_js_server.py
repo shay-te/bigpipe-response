@@ -5,14 +5,12 @@ import os
 import random
 import signal
 import string
-import sys
 import threading
-
-import requests
 from contextlib import suppress
 from subprocess import Popen, PIPE
 from time import sleep
 
+import requests
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
