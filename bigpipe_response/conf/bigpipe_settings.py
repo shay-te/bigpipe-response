@@ -14,12 +14,12 @@ class BigpipeSettings:
     @staticmethod
     def validate_folder_name(folder_name, property_name):
         if not folder_name or not isinstance(folder_name, str):
-            raise InvalidConfiguration('{}} cannot be blank'.format(property_name))
+            raise InvalidConfiguration('{} cannot be blank'.format(property_name))
 
         keep_characters = ('_')
         fixed_folder_name = "".join(c for c in folder_name if c.isalnum() or c in keep_characters).rstrip()
         if fixed_folder_name != folder_name:
-            raise InvalidConfiguration('{}} must be set to a valid folder name. no spaces, dots are allowed. suggestions: {}'.format(property_name, fixed_folder_name))
+            raise InvalidConfiguration('{} must be set to a valid folder name. no spaces, dots are allowed. suggestions: {}'.format(property_name, fixed_folder_name))
 
     @staticmethod
     def validate_rendered_output_path(config):
