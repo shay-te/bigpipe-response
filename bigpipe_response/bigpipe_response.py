@@ -7,6 +7,7 @@ import threading
 import traceback
 
 from django.http import StreamingHttpResponse
+from django.http.response import HttpResponseBase
 
 from bigpipe_response.bigpipe import Bigpipe
 from bigpipe_response.bigpipe_render_options import BigpipeRenderOptions
@@ -50,7 +51,7 @@ class BigpipeResponse(StreamingHttpResponse):
             self.processed_js_files = self.processed_js_files + content_result.js_effected_files
             self.processed_css_files = self.processed_css_files + content_result.css_effected_files
 
-            for entry_content in self.__yield_content(content_result):
+            for entry_content in self.__build_bigpipe_data_main_yield(content_result):
                 yield entry_content
 
             dependencies = {}
@@ -68,20 +69,27 @@ class BigpipeResponse(StreamingHttpResponse):
             yield_paglets = []
             yield_later = {}
             for _ in range(paglent_count):
-                pagelet_response = que.get()
-                if isinstance(pagelet_response, BaseException): raise pagelet_response
+                content_result_pagelet = que.get()
 
+                if not isinstance(content_result_pagelet, ContentResult):
+                    content_result_pagelet_type = type(content_result_pagelet) if content_result_pagelet else None
+                    self.logger.error('expected `ContentResult` got `{}` return for pagelet path `{}`'.format(content_result_pagelet_type, self.request.path))
+                    if isinstance(content_result_pagelet, HttpResponseBase):
+                        raise ValueError('Expected `ContentResult`, got `HttpResponseBase` instead')
+                    raise content_result_pagelet
+
+                bigpipe_paglet_data = content_result_pagelet.to_dict(pagelet.target)
                 # Handle depends_on
                 # When depends_on flag is set, the result will be cached and pushed only after the dependency is loaded
-                target = pagelet_response['target']
+                target = bigpipe_paglet_data['target']
                 if target in dependencies:
                     dependent_target = dependencies.get(target)
                     if dependent_target not in yield_paglets:
-                        yield_later.setdefault(dependent_target, []).append(pagelet_response)
+                        yield_later.setdefault(dependent_target, []).append(bigpipe_paglet_data)
                         continue
 
                 yield_paglets.append(target)
-                yield self._render_paglet_content(pagelet_response)
+                yield self._render_paglet_content(bigpipe_paglet_data)
 
                 if target in yield_later:
                     for yield_pagelet_response in yield_later.get(target):
@@ -101,9 +109,9 @@ class BigpipeResponse(StreamingHttpResponse):
                 i18n = {}
                 content_result_error = ContentResult(content, js, css, i18n, [], [], [], [])
                 if last_pagelet_target:
-                    yield self._render_paglet_content(self.__get_pagelet_content(last_pagelet_target, content_result_error))
+                    yield self._render_paglet_content(content_result_error.to_dict(last_pagelet_target))
                 else:
-                    for entry_content in self.__yield_content(content_result_error):
+                    for entry_content in self.__build_bigpipe_data_main_yield(content_result_error):
                         yield entry_content
             else:
                 raise ex
@@ -114,12 +122,17 @@ class BigpipeResponse(StreamingHttpResponse):
         try:
             pagelet_response = pagelet.render()
             if isinstance(pagelet_response, BigpipeResponse):
+                # 1. execute, and get the pagelet content.
                 content_result = pagelet_response.content_loader.load_content(pagelet.target, self.processed_js_files, self.processed_css_files)
+
+                # 2. build and collect ignore list of loaded. since the main request initiated.
                 self.processed_js_files = self.processed_js_files + content_result.js_effected_files
                 self.processed_css_files = self.processed_css_files + content_result.css_effected_files
-                result_queue.put(pagelet_response.__get_pagelet_content(pagelet.target, content_result))
+
+                # 3. build pagelet as bigpipe data
+                result_queue.put(content_result)
             else:
-                logging.warning('for pagelets expected only bigpipe response to operate, will return response content. {}'.format(pagelet_response))
+                logging.error('Pagelet response for target `{}` is not of type `BigpipeResponse`, will return response content. {}'.format(pagelet.target, pagelet_response))
                 result_queue.put(pagelet_response)
         except BaseException as ex:
             result_queue.put(ex)
@@ -127,7 +140,7 @@ class BigpipeResponse(StreamingHttpResponse):
     #
     # Yield content
     #
-    def __yield_content(self, content_result: ContentResult):
+    def __build_bigpipe_data_main_yield(self, content_result: ContentResult):
         if content_result.content:
             yield content_result.content
         if content_result.i18n:
@@ -136,24 +149,6 @@ class BigpipeResponse(StreamingHttpResponse):
             yield '\n<style>\n\t{}\n</style>\n'.format(content_result.css)
         if content_result.js:
             yield '\n<script>\n\t{}\n</script>\n'.format(content_result.js)
-
-    def __get_pagelet_content(self, paglet_target: str, content_result: ContentResult):
-        result = {'target': paglet_target}
-        if content_result.css:
-            result['css'] =  content_result.css
-        if content_result.content:
-            result['html'] = content_result.content
-        if content_result.js:
-            result['js'] = content_result.js
-        if content_result.i18n:
-            result['i18n'] = content_result.i18n
-        if content_result.js_links:
-            result['js_links'] = content_result.js_links
-        if content_result.css_links:
-            result['css_links'] = content_result.css_links
-        if Bigpipe.get().config.is_production_mode:
-            result['remove'] = True
-        return result
 
     def _render_paglet_content(self, pagelet_content):
         return """

@@ -38,7 +38,7 @@ class ContentLoader(object):
 
         self.local_language = translation.get_language()
 
-    def load_content(self, target_element: str, ignored_js_dependencies: list, ignored_css_dependencies: list):
+    def load_content(self, target_element: str, ignored_js_dependencies: list, ignored_css_dependencies: list) -> ContentResult:
         #
         # link handing
         #
