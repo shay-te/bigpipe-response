@@ -55,7 +55,7 @@ The server will wrap each pagelet response into a JSON (this includes JS, CSS, i
 </script>
 ```
 
-##### 5.  the function `renderPagelet` inside the `bigpipe.js` file will use the JSON data to populate the HTML page.
+##### 5.  the function `renderPagelet` inside the `bigpipe.js` file will pay the JSON data to populate the HTML page.
 
 ##### 6.  When all pagelets are served, the server will send closing `</BODY></HTML>` tags. 
 

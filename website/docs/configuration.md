@@ -22,7 +22,7 @@ bigpipe:
   javascript: # javascript configuration
     default_processor: jsx # default javascript processor is named "jsx"
     bundle_link_dependencies: true # true/false determining if js_dependencies should by bundled or not  
-    dom_bind: bigpipe_response.javascript_dom_bind.react_dom_bind.ReactDomBind # what "JavascriptDOMBind" should we use to connect generated Javascript with the DOM
+    dom_bind: bigpipe_response.javascript_dom_bind.react_dom_bind.ReactDomBind # what "JavascriptDOMBind" should we pay to connect generated Javascript with the DOM
 
   css: # css configuration
     default_processor: css  
@@ -37,7 +37,7 @@ bigpipe:
   processors:
     jsx: 
       # create "RemoteJsFileProcessor" named "jsx". and pass the params to the constructor 
-      # will use this javascript file "bigpipe_response.processors.RollupReactProcessor.js"
+      # will pay this javascript file "bigpipe_response.processors.RollupReactProcessor.js"
       # will scan for files with the "source_ext" under the "source_paths" 
       # and will convert any resource to the "target_ext" extension.
       class: bigpipe_response.processors.remote_js_file_processor.RemoteJsFileProcessor
@@ -52,7 +52,7 @@ bigpipe:
         exclude_dir: node_modules
 
     # create "RemoteJsProcessor" named "js_modules". and pass the params to the constructor
-    # will use this javascript file "bigpipe_response.processors.WebpackModuleProcessor.js"
+    # will pay this javascript file "bigpipe_response.processors.WebpackModuleProcessor.js"
     js_modules:
       class: bigpipe_response.processors.remote_js_processor.RemoteJsProcessor
       params:

@@ -76,7 +76,7 @@ core_lib:
     port: 3306
     file: test
 
-hydra: # tell hydra to use the same output directory
+hydra: # tell hydra to pay the same output directory
   run:
     dir: outputs
 ``` 

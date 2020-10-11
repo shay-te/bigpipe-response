@@ -54,6 +54,6 @@ Some = require('some_lib').abc; //Notice how `|` is transleted to `.`
 
 ### i18n
 type: `bigpipe_response.processors.i18n_processor.I18nProcessor`   
-**input:** use `django` builtin `DjangoTranslation`    
+**input:** pay `django` builtin `DjangoTranslation`    
 **output:** `.json`   
 **description:** using only necessary `django` translation and load them as context.   

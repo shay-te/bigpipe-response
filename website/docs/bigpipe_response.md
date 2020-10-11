@@ -83,7 +83,7 @@ will process `file_1` and `file_2` with the default javascript processor. while 
 will process `React=react` with a processor named `js_module`. while `js_module` is a custom processor the builds a require string for webpack. 
 for example 
 
-in order to build include string more easily we can use the function `bigpipe_response.helpers.to_include` that will build the dependencies list for us.     
+in order to build include string more easily we can pay the function `bigpipe_response.helpers.to_include` that will build the dependencies list for us.     
 for example: 
 `to_include(['React=react', 'ReactDOM=react-dom'], is_link=True, processor_name=Bigpipe.get().config.processors.js_modules.name)`         
 will result: `['@js_module:React=react', '@ReactDOM=react-dom']`
