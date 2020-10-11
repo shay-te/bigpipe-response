@@ -4,9 +4,11 @@ var path = require('path');
 var fs = require('fs');
 
 var terser = require('rollup-plugin-terser').terser;
-var resolve = require('@rollup/plugin-node-resolve');
+var resolve = require('@rollup/plugin-node-resolve').nodeResolve;
 var commonjs = require('@rollup/plugin-commonjs');
 var injectProcessEnv = require('rollup-plugin-inject-process-env');
+
+
 
 function includeFiles (include, exclude) {
     const emptyFile = 'export default {}';
@@ -32,15 +34,11 @@ function includeFiles (include, exclude) {
 }
 
 async function build(isProduction, input_file_path, output_file_path, include, exclude, extra_plugins) {
-    var plugins = [injectProcessEnv({NODE_ENV: isProduction ? 'production' : 'development'}),
-                   resolve({browser: true, jsnext: true}),
-                   commonjs()];
-
-
-    var input = input_file_path;
-
+    var plugins = [];
+    plugins.push(injectProcessEnv({NODE_ENV: isProduction ? 'production' : 'development'}));
+    plugins.push(resolve({browser: true, jsnext: true}));
+    plugins.push(commonjs({include: '/node_modules/'}));
     plugins.push(includeFiles(include, exclude))
-
     if(extra_plugins && extra_plugins.constructor === Array) {
         plugins = plugins.concat(extra_plugins);
     }
@@ -49,6 +47,8 @@ async function build(isProduction, input_file_path, output_file_path, include, e
         plugins.push(terser({
                                 ecma: 5,
                                 mangle : false,
+                                keep_classnames: true,
+                                keep_fnames: true,
                                 compress: {
                                     reduce_vars: false,
                                     unused: false
