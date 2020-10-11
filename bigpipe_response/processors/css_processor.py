@@ -25,7 +25,9 @@ class CSSProcessor(BaseFileProcessor):
                 return []
             return [(path, )]
 
-        if not self.is_production_mode:  # on development mode files may change
+        # DEVELOPMENT MODE mode files may change
+        # Re-crate the include path
+        if not self.is_production_mode:
             self.include_paths = self.__generate_include_paths()
 
         # Include the main file
@@ -70,7 +72,11 @@ class CSSProcessor(BaseFileProcessor):
 
     def __generate_include_paths(self):
         result = []
-        for code_base_dir in self.source_paths:
-            for dir in os.walk(code_base_dir):
-                result.append(dir[0])
+        for i in range(len(self.source_paths)):
+            code_base_dir = str(self.source_paths[i])
+            result.append(code_base_dir)
+            for root, dirs, files in os.walk(code_base_dir):
+                dirs[:] = [d for d in dirs if not d.startswith('.')]
+                for dir in dirs:
+                    result.append(os.path.join(root, dir))
         return result

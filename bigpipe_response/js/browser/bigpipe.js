@@ -13,7 +13,7 @@ window.renderPagelet = function(p) {
     try {
         var el = document.getElementById(p.target);
         if (!el) {
-            console.error("ERROR: pagelet fill, id:" + p.html + " Not exist");
+            console.error("ERROR: pagelet fill, id:" + p.target + " Not exist");
             return;
         }
         if(p.i18n) {
