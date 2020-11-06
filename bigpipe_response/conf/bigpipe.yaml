@@ -1,3 +1,4 @@
+# @package _global_
 bigpipe:
   rendered_output_path: null
   static_uri: null
@@ -25,34 +26,30 @@ bigpipe:
 
   processors:
     jsx:
-      class: bigpipe_response.processors.remote_js_file_processor.RemoteJsFileProcessor
-      params:
-        processor_name: jsx
-        javascript_handler: bigpipe_response.processors.RollupReactProcessor.js
-        source_paths: null
-        source_ext:
-          - js
-          - jsx
-        target_ext: js
-        exclude_dir: node_modules
+      _target_: bigpipe_response.processors.remote_js_file_processor.RemoteJsFileProcessor
+      processor_name: jsx
+      javascript_handler: bigpipe_response.processors.RollupReactProcessor.js
+      source_paths: null
+      source_ext:
+        - js
+        - jsx
+      target_ext: js
+      exclude_dir: node_modules
 
     js_modules:
-      class: bigpipe_response.processors.remote_js_processor.RemoteJsProcessor
-      params:
-        processor_name: js_modules
-        javascript_handler: bigpipe_response.processors.WebpackModuleProcessor.js
-        target_ext: js
+      _target_: bigpipe_response.processors.remote_js_processor.RemoteJsProcessor
+      processor_name: js_modules
+      javascript_handler: bigpipe_response.processors.WebpackModuleProcessor.js
+      target_ext: js
 
     css:
-      class: bigpipe_response.processors.css_processor.CSSProcessor
-      params:
-        processor_name: css
-        source_paths: none
-        source_ext:
-          - scss
-        target_ext: css
+      _target_: bigpipe_response.processors.css_processor.CSSProcessor
+      processor_name: css
+      source_paths: none
+      source_ext:
+        - scss
+      target_ext: css
 
     i18n:
-      class: bigpipe_response.processors.i18n_processor.I18nProcessor
-      params:
-        processor_name: i18n
+      _target_: bigpipe_response.processors.i18n_processor.I18nProcessor
+      processor_name: i18n

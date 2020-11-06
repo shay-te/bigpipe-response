@@ -43,7 +43,7 @@ class NodeInstaller(object):
             packages_diff = []
             package_lock_json_file = os.path.join(self.js_folder, 'package-lock.json')
             if not os.path.isfile(package_lock_json_file):
-                packages_diff = packages + local_packages
+                packages_diff = packages + list(local_packages.values())
             else:
                 with open(package_lock_json_file) as file:
                     dependencies = json.loads(file.read(), strict=False)['dependencies']

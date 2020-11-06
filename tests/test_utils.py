@@ -37,5 +37,5 @@ class TestUtils(object):
             OmegaConf.register_resolver('full_path', lambda sub_path: os.path.join(test_path, sub_path))
 
         if not GlobalHydra().is_initialized():
-            initialize(config_dir=tests_data_path, strict=True, caller_stack_depth=2)
+            initialize(config_dir=tests_data_path, caller_stack_depth=2)
         return compose("test_config.yaml", overrides=config_override)

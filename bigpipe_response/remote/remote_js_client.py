@@ -37,7 +37,10 @@ class RemoteJSClient(object):
             if response.status_code == 200:
                 return response_json
             else:
-                raise ValueError(response_json['message'])
+                message = response_json['message']
+                if message:
+                    message = message.replace('\\n', '\n')
+                raise ValueError(message)
         except BaseException as ex:
             self.logger.error(ex)
             raise ex

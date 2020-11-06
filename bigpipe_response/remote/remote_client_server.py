@@ -107,6 +107,7 @@ class RemoteClientServer(object):
                     return
                 except BaseException as ex:
                     self.logger.error("Available port found ({}), But unable to start server. Error: \n{}".format(port, traceback.format_exc()))
+                    self.logger.exception(ex)
                     port_scan_start = port_scan_start + 1
             else:
                 break

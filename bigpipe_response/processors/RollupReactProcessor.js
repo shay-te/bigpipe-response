@@ -3,11 +3,10 @@ var build = require('RollupBaseBuild');
 var React = require('react');
 var ReactDOMServer = require('react-dom/server');
 var createReactClass = require('create-react-class');
-
-const babel = require('rollup-plugin-babel');
+const babelPlugin = require('@rollup/plugin-babel');
 
 var plugins = [
-    babel({
+    babelPlugin.babel({
         exclude: 'node_modules/**',
         plugins: ['@babel/plugin-transform-react-jsx', '@babel/plugin-proposal-class-properties'],
         presets: ['@babel/preset-env']
