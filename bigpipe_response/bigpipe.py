@@ -5,7 +5,7 @@ from hydra.utils import get_class
 from omegaconf import DictConfig, OmegaConf
 
 from bigpipe_response.bigpipe_render_options import BigpipeRenderOptions
-from bigpipe_response.conf.bigpipe_settings import BigpipeSettings
+from bigpipe_response.config.bigpipe_settings import BigpipeSettings
 from bigpipe_response.javascript_manager import JavascriptManager
 
 
@@ -19,7 +19,7 @@ class Bigpipe(object):
         #
         # config
         #
-        default_config = OmegaConf.load(os.path.join(os.path.dirname(__file__), 'conf', 'bigpipe.yaml'))
+        default_config = OmegaConf.load(os.path.join(os.path.dirname(__file__), 'config', 'bigpipe_response.yaml'))
         self.conf = OmegaConf.merge(default_config, config)
 
         #

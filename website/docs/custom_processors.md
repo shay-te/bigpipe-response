@@ -90,7 +90,7 @@ in the example above we are using, `var build = require('RollupBaseBuild');`  th
 Bigpipe Response provides two ways to register processors 
 
 ### 1. config.yaml
-the base `bigpipe.yaml` config file list all default processors.  
+the base `bigpipe_response.yaml` config file list all default processors.  
 when calling the `Bigpipe.init(config)`. Bigpipe will register all processors under the `bigpipe.processors` path.  
 by overriding the default configuration we can add new processor or edit existing processors 
 for example a defining a new javascript processor : 

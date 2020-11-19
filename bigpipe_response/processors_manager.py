@@ -4,7 +4,7 @@ import os
 from hydra.utils import instantiate
 from omegaconf import DictConfig
 
-from bigpipe_response.conf.bigpipe_settings import BigpipeSettings
+from bigpipe_response.config.bigpipe_settings import BigpipeSettings
 from bigpipe_response.processors.base_file_processor import BaseFileProcessor
 from bigpipe_response.processors.base_processor import BaseProcessor
 from bigpipe_response.remote.js_processor_client import JSRemoteClient
