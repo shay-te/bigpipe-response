@@ -75,7 +75,7 @@ class BigpipeResponse(StreamingHttpResponse):
                     content_result_pagelet_type = type(content_result_pagelet) if content_result_pagelet else None
                     self.logger.error('expected `ContentResult` got `{}` return for pagelet path `{}`'.format(content_result_pagelet_type, self.request.path))
                     if isinstance(content_result_pagelet, HttpResponseBase):
-                        raise ValueError('Expected `ContentResult`, got `HttpResponseBase` instead')
+                        raise ValueError(f'pagelet with url `{content_result_pagelet.url}` Expected `ContentResult`, got `HttpResponseBase` instead')
                     raise content_result_pagelet
 
                 bigpipe_paglet_data = content_result_pagelet.to_dict(pagelet.target)
@@ -135,6 +135,7 @@ class BigpipeResponse(StreamingHttpResponse):
                 logging.error('Pagelet response for target `{}` is not of type `BigpipeResponse`, will return response content. {}'.format(pagelet.target, pagelet_response))
                 result_queue.put(pagelet_response)
         except BaseException as ex:
+            logging.exception(ex)
             result_queue.put(ex)
 
     #
