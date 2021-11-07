@@ -1,14 +1,12 @@
-bigpipe:
-  rendered_output_path: ${full_path:data_output}
+bigpipe_response:
+  rendered_output_path: ${output_path:data_output}
   static_uri:
   is_production_mode: true
 
   processors:
     jsx:
-      params:
-        source_paths:
-          - ${full_path:data}
+      source_paths:
+        - ${source_path:data}
     css:
-      params:
-        source_paths:
-          - ${full_path:data}
+      source_paths:
+        - ${source_path:data}

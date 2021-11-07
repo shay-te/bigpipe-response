@@ -31,9 +31,12 @@ class TestUtils(object):
 
     @staticmethod
     def get_test_configuration(config_override: list = []):
-        test_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
-        if not OmegaConf.has_resolver('full_path'):
-            OmegaConf.register_new_resolver('full_path', lambda sub_path: os.path.join(test_path))
+        source_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+        output_path = os.path.join(source_path, 'output')
+
+        if not OmegaConf.has_resolver('output_path'):
+            OmegaConf.register_new_resolver('output_path', lambda sub_path: output_path)
+            OmegaConf.register_new_resolver('source_path', lambda sub_path: source_path)
 
         if not GlobalHydra().is_initialized():
             hydra.initialize(config_path='data/config', caller_stack_depth=2)
