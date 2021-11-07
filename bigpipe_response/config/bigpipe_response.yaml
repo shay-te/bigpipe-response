@@ -1,5 +1,5 @@
 # @package _global_
-bigpipe:
+bigpipe_response:
   rendered_output_path: null
   static_uri: null
   is_production_mode: null

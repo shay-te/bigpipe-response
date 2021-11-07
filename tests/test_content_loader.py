@@ -12,7 +12,7 @@ import django
 django.setup()
 
 TestUtils.setup_logger()
-Bigpipe.init(TestUtils.get_test_configuration().bigpipe)
+Bigpipe.init(TestUtils.get_test_configuration().bigpipe_response)
 TestUtils.empty_output_folder(Bigpipe.get().config.rendered_output_path)
 print("Installing javascript dependencies.")
 

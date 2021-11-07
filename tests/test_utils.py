@@ -2,8 +2,8 @@ import logging
 import os
 import sys
 
-from hydra._internal.hydra import GlobalHydra
-from hydra.experimental import initialize, compose
+import hydra
+from hydra.core.global_hydra import GlobalHydra
 from omegaconf import OmegaConf
 
 
@@ -31,11 +31,10 @@ class TestUtils(object):
 
     @staticmethod
     def get_test_configuration(config_override: list = []):
-        test_path = os.path.dirname(os.path.abspath(__file__))
-        tests_data_path = os.path.join(test_path, 'data', 'config')
-        if not OmegaConf.get_resolver('full_path'):
-            OmegaConf.register_resolver('full_path', lambda sub_path: os.path.join(test_path, sub_path))
+        test_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+        if not OmegaConf.has_resolver('full_path'):
+            OmegaConf.register_new_resolver('full_path', lambda sub_path: os.path.join(test_path))
 
         if not GlobalHydra().is_initialized():
-            initialize(config_dir=tests_data_path, caller_stack_depth=2)
-        return compose("test_config.yaml", overrides=config_override)
+            hydra.initialize(config_path='data/config', caller_stack_depth=2)
+        return hydra.compose("test_config.yaml", overrides=config_override)

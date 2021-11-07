@@ -8,7 +8,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.settings')
 
 TestUtils.setup_logger()
 config = TestUtils.get_test_configuration()
-Bigpipe.init(config.bigpipe)
+Bigpipe.init(config.bigpipe_response)
 print("Installing javascript dependencies.")
 
 TestUtils.empty_output_folder(Bigpipe.get().config.rendered_output_path)
