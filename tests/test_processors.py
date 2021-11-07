@@ -20,8 +20,7 @@ class TestBigpipeProcessor(unittest.TestCase):
         Bigpipe.get().shutdown()
 
     def test_css_manager(self):
-        processor_result = Bigpipe.get().processors.run_processor(Bigpipe.get().config.processors.css.params.processor_name,
-                                                                  "main")
+        processor_result = Bigpipe.get().processors.run_processor(Bigpipe.get().config.processors.css.processor_name, "main")
         fp = open(processor_result.output_file, "r")
         content = fp.read()
         fp.close()
@@ -32,7 +31,7 @@ class TestBigpipeProcessor(unittest.TestCase):
         self.assertRaises(
             ValueError,
             Bigpipe.get().processors.run_processor,
-            Bigpipe.get().config.processors.css.params.processor_name,
+            Bigpipe.get().config.processors.css.processor_name,
             "paramsadasd",
         )
 
@@ -41,13 +40,13 @@ class TestBigpipeProcessor(unittest.TestCase):
         self.assertRaises(
             ValueError,
             Bigpipe.get().processors.run_processor,
-            Bigpipe.get().config.processors.jsx.params.processor_name,
+            Bigpipe.get().config.processors.jsx.processor_name,
             "dasdasdasd",
         )
 
         # Existing working component
         processor_result = Bigpipe.get().processors.run_processor(
-            Bigpipe.get().config.processors.jsx.params.processor_name, "TestMainPage"
+            Bigpipe.get().config.processors.jsx.processor_name, "TestMainPage"
         )
         fp = open(processor_result.output_file, "r")
         content = fp.read()
@@ -55,18 +54,18 @@ class TestBigpipeProcessor(unittest.TestCase):
 
         self.assertNotEqual(content, None)
         self.assertNotEqual(content, "")
-        self.assertNotEqual(content.index("var TestSecondPage"), -1)
-        self.assertNotEqual(content.index("TestMainPage"), -1)
+        self.assertNotEqual(content.index("i am the second page"), -1)
+        self.assertNotEqual(content.index("HERE I AM"), -1)
 
         # Component with error
         with self.assertRaises(ValueError):
             Bigpipe.get().processors.run_processor(
-                Bigpipe.get().config.processors.jsx.params.processor_name, "ComponentWithError"
+                Bigpipe.get().config.processors.jsx.processor_name, "ComponentWithError"
             )
 
         try:
             Bigpipe.get().processors.run_processor(
-                Bigpipe.get().config.processors.jsx.params.processor_name, "ComponentWithError"
+                Bigpipe.get().config.processors.jsx.processor_name, "ComponentWithError"
             )
         except Exception as e:
             self.assertGreater(

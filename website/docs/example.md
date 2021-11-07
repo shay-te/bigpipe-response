@@ -191,7 +191,7 @@ from bigpipe_response.bigpipe import Bigpipe
 from bigpipe_response.pagelet import Pagelet
 from bigpipe_response.helpers import to_include
 
-js_react_dependencies = to_include(['React=react', 'ReactDOM=react-dom', 'createReactClass=create-react-class'], is_link=True, processor_name=Bigpipe.get().config.processors.js_modules.params.processor_name)
+js_react_dependencies = to_include(['React=react', 'ReactDOM=react-dom', 'createReactClass=create-react-class'], is_link=True, processor_name=Bigpipe.get().config.processors.js_modules.processor_name)
 ```
 
 * `BigpipeResponse.RenderType.TEMPLATE` renders `search.html` using django template engine.       

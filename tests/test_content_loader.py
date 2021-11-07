@@ -1,5 +1,6 @@
 import os
 import unittest
+from time import sleep
 
 from bigpipe_response.bigpipe import Bigpipe
 from bigpipe_response.bigpipe_response import BigpipeResponse
@@ -42,7 +43,7 @@ class TestContentLoader(unittest.TestCase):
             self.assertNotEqual(content_result.i18n['CONST_USER_open_question_placeholder_1'], None)
 
     def test_multiple_processors(self):
-        module_processor_name = Bigpipe.get().config.processors.js_modules.params.processor_name
+        module_processor_name = Bigpipe.get().config.processors.js_modules.processor_name
         content_loader = ContentLoader(render_type=BigpipeResponse.RenderType.JAVASCRIPT,
                                        render_source='TestMainPage',
                                        js_dependencies=['simple_js_file'] + to_include(['React=react', 'ReactDOM=react-dom', 'createReactClass=create-react-class'], is_link=False, processor_name=module_processor_name),
@@ -69,6 +70,7 @@ class TestContentLoader(unittest.TestCase):
     def test_es6_react_component(self):
         content_loader = ContentLoader(render_type=BigpipeResponse.RenderType.JAVASCRIPT,
                                        render_source='TestComponentES6')
+        sleep(1)
         content_result = content_loader.load_content('body', [], [])
         self.assertNotEqual(content_result.content, None)
         self.assertNotEqual(content_result.js, None)
