@@ -19,7 +19,7 @@ __pycache__/
 /bigpipe_response/js/.cache
 
 # TESTS
-/tests/data/output
+/tests/output
 
 # BUILD
 bigpipe_response.egg-info/

@@ -31,8 +31,12 @@ class TestUtils(object):
 
     @staticmethod
     def get_test_configuration(config_override: list = []):
-        source_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
-        output_path = os.path.join(source_path, 'output')
+        test_path = os.path.dirname(os.path.abspath(__file__))
+        source_path = os.path.join(test_path, 'data')
+        output_path = os.path.join(test_path, 'output')
+
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
 
         if not OmegaConf.has_resolver('output_path'):
             OmegaConf.register_new_resolver('output_path', lambda sub_path: output_path)
