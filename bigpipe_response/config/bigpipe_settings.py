@@ -24,7 +24,7 @@ class BigpipeSettings:
     @staticmethod
     def validate_rendered_output_path(config):
         if not config.rendered_output_path or not os.path.isdir(config.rendered_output_path):
-            raise InvalidConfiguration('rendered_output_path need to be a an exists path')
+            raise InvalidConfiguration(f'rendered_output_path `{config.rendered_output_path}` need to be a an exists path')
 
     @staticmethod
     def validate_settings(config):
