@@ -2,9 +2,6 @@ include requirements.txt
 include LICENSE
 include README.md
 
-# Include configuration
-include bigpipe_response/conf/*.yaml
-
 # Include debugger files
 include bigpipe_response/debugger/*.css
 include bigpipe_response/debugger/*.html
@@ -14,8 +11,14 @@ recursive-include bigpipe_response/processors *.js
 recursive-include bigpipe_response/build *
 recursive-include bigpipe_response/js *
 
-# Exclude node installation fils
+# Exclude node installation files
 recursive-exclude bigpipe_response/js/registered_processors *.js
 exclude bigpipe_response/js/package-lock.json
 recursive-exclude bigpipe_response/js/node_modules *
 recursive-exclude scripts *
+
+
+global-exclude *.pyc
+global-exclude __pycache__
+recursive-include hydra_plugins/* *.yaml
+recursive-include bigpipe_response/* *.yaml

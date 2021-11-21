@@ -1,6 +1,6 @@
 import os
 
-import setuptools
+from setuptools import find_namespace_packages, setup, find_packages
 from pip._internal.network.session import PipSession
 from pip._internal.req import parse_requirements
 
@@ -12,25 +12,27 @@ install_reqs = parse_requirements(os.path.join(dir_path, 'requirements.txt'), se
 with open(os.path.join(dir_path, "README.md"), "r") as fh:
    long_description = fh.read()
 
+packages1 = find_packages()
+packages2 = find_namespace_packages(include=['hydra_plugins.*'])
+packages = list(set(packages1 + packages2))
 
-setuptools.setup(
+setup(
    name='bigpipe_response',
    version=bigpipe_response.__version__,
+   author='Shay Tessler',
+   author_email='shay.te@gmail.com',
    description='Bigpipe, Pipelining web pages for high performance, django response object',
    long_description=long_description,
    long_description_content_type="text/markdown",
    url="https://github.com/shay-te/bigpipe-response",
-   setup_requires=['wheel'],
-   author='Shay Tessler',
-   author_email='shay.te@gmail.com',
-   packages=setuptools.find_packages(),
-   include_package_data=True,
-   install_requires=[str(ir.requirement) for ir in install_reqs],
+   packages=packages,
    license="MIT",
    classifiers=[
       "Programming Language :: Python :: 3",
       "License :: OSI Approved :: MIT License",
       "Operating System :: OS Independent",
    ],
+   install_requires=[str(ir.requirement) for ir in install_reqs],
+   include_package_data=True,
    python_requires='>=3.7'
 )
