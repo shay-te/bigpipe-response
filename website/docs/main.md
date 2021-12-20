@@ -24,11 +24,11 @@ the project was inspired and using facebook bigpipe principals. [(BigPipe: Pipel
 
 ## The source
 
-[https://github.com/shacoshe/core-lib](https://github.com/shacoshe/core-lib)
+[https://github.com/shay-te/bigpipe-response](https://github.com/shay-te/bigpipe-response)
    
 ## Example project
 
-[https://github.com/shacoshe/bigpipe-response-example](https://github.com/shacoshe/bigpipe-response-example)
+[https://github.com/shay-te/bigpipe-response-example](https://github.com/shay-te/bigpipe-response-example)
 
 
 ## Contributing
