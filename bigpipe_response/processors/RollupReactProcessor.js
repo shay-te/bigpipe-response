@@ -9,7 +9,8 @@ var plugins = [
     babelPlugin.babel({
         exclude: 'node_modules/**',
         plugins: ['@babel/plugin-transform-react-jsx', '@babel/plugin-proposal-class-properties'],
-        presets: ['@babel/preset-env']
+        presets: ['@babel/preset-env'],
+        babelHelpers: 'bundled'
     }),
 ];
 
