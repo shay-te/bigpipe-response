@@ -65,7 +65,7 @@ class NodeInstaller(object):
         command_install_dev = 'npm install {}'.format(' '.join(packages))
         exitcode, out, err = self.__execute_command(js_folder, command_install_dev)
         if exitcode != 0:
-            raise ValueError('enable to install [{}], exit with error [{}]'.format(command_install_dev, err))
+            raise ValueError('unable to install [{}], exit with error [{}]'.format(command_install_dev, err))
 
         self.logger.info('NodeInstaller output:\n{}'.format(out))
         if err:
