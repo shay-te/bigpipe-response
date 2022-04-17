@@ -38,10 +38,10 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 ## Authors
 
-**Shay Tessler**  - [github](https://github.com/shacoshe)
+**Shay Tessler**  - [github](https://github.com/shay-te)
 
 
 ## License
 
-This project is licensed under the MIT - see the [LICENSE](https://github.com/shacoshe/bigpipe-response/blob/master/LICENSE) file for details
+This project is licensed under the MIT - see the [LICENSE](https://github.com/shay-te/bigpipe-response/blob/master/LICENSE) file for details
 

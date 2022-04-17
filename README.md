@@ -10,4 +10,4 @@ A standard [django](https://www.djangoproject.com/) `StreamingHttpResponse` resp
 Check the [website](https://bigpiperesponse.netlify.com/) for more information
 
 ## License
-BigpipepResponse in licenced under [MIT](https://github.com/shacoshe/bigpipe-response/blob/master/LICENSE)
+BigpipepResponse in licenced under [MIT](https://github.com/shay-te/bigpipe-response/blob/master/LICENSE)

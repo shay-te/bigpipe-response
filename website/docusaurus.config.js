@@ -22,7 +22,7 @@ module.exports = {
       },
       links: [
         {to: 'docs/main', label: 'Docs', position: 'left'},
-        {to: 'https://github.com/shacoshe/bigpipe-response', label: 'BigpipeResponse@GitHub', position: 'left'},
+        {to: 'https://github.com/shay-te/bigpipe-response', label: 'BigpipeResponse@GitHub', position: 'left'},
 //        {to: 'blog', label: 'Blog', position: 'left'},
 //        {
 //          href: 'https://github.com/facebook/docusaurus',

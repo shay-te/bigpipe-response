@@ -120,5 +120,5 @@ Bigipe.init(config, custom_processors)
 
 # Deep Understanding 
 
-for more deeply understand how `BaseProcessor` works. please take a look at the comments on the [code here](https://github.com/shacoshe/bigpipe-response/blob/master/bigpipe_response/processors/base_processor.py)
+for more deeply understand how `BaseProcessor` works. please take a look at the comments on the [code here](https://github.com/shay-te/bigpipe-response/blob/master/bigpipe_response/processors/base_processor.py)
 

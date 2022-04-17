@@ -35,10 +35,10 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shacoshe/bigpipe-response.git"
+    "url": "git+https://github.com/shay-te/bigpipe-response.git"
   },
   "bugs": {
-    "url": "https://github.com/shacoshe/bigpipe-response/issues"
+    "url": "https://github.com/shay-te/bigpipe-response/issues"
   },
-  "homepage": "https://github.com/shacoshe/bigpipe-response#readme"
+  "homepage": "https://github.com/shay-te/bigpipe-response#readme"
 }
