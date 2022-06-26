@@ -25,6 +25,9 @@ require('register-module')({
 //    importFiles += 'import ' + path.relative(input_file_path, include[i]) + ';\n';
 //}
 
+const path = os.path.join(__dirname, '..')
+
+
 var jsx = require('rollup-plugin-jsx');
 var plugins = [ jsx( {factory: 'React.createElement', 'passUnknownTagsToFactory': true} ) ];
 

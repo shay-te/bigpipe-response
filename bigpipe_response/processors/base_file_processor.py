@@ -2,7 +2,12 @@ import logging
 import os
 import re
 from abc import abstractmethod
-from collections import Iterable
+try:
+    # Python <= 3.9
+    from collections import Iterable
+except ImportError:
+    # Python > 3.9
+    from collections.abc import Iterable
 
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer

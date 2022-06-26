@@ -8,6 +8,6 @@
   "author": "Shay Tessler",
   "license": "ISC",
   "dependencies": {
-    "bigpipe_response": "file:D:/programming/eclipse_projects/bigpipe_response/bigpipe_response/js/bigpipe_response-1.0.0.tgz"
+    "bigpipe_response": "file:./bigpipe_response-1.0.0.tgz"
   }
 }
